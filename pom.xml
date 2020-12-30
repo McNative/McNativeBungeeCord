@@ -25,7 +25,7 @@
 
     <groupId>org.mcnative.bungeecord</groupId>
     <artifactId>McNativeBungeeCord</artifactId>
-    <version>1.7.75.4</version>
+    <version>1.7.76.6-SNAPSHOT</version>
 
     <distributionManagement>
         <repository>
