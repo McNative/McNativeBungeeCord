@@ -141,7 +141,7 @@ public class McNativeLauncher {
 
         ResourceMessageExtractor.extractMessages(McNativeLauncher.class.getClassLoader(),"system-messages/","McNative");
 
-        if(McNativeBungeeCordConfiguration.MAF_ENABLED && !McNativeBungeeCordConfiguration.SERVER_ID.equals("00000-00000-00000")){
+        if(McNativeBungeeCordConfiguration.CONSOLE_MAF_ENABLED && !McNativeBungeeCordConfiguration.CONSOLE_NETWORK_ID.equals("00000-00000-00000")){
             MAFService.start();
         }
 
