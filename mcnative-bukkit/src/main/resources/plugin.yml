@@ -1,7 +1,0 @@
-main: 'org.mcnative.bukkit.BukkitMcNativeBootstrap'
-name: 'McNative'
-version: '1.0.0'
-description: 'McNative is a framework for creating cross platform Minecraft applications. McNative supports Minecraft Java Edition 1.7 to 1.14 and Bedrock edition 1.12 to 1.12'
-website: 'https://mcnative.org'
-authors: ['Davide Wietlisbach','Philipp Elvin Friedhoff']
-softdepend: ['PlaceHolderApi','Vault','CloudNetAPI','CloudNet-Bridge','ViaVersion','ProtocolLib']

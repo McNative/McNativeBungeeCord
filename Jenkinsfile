@@ -6,21 +6,20 @@ final String CI_NAME = "PretronicCI"
 final String CI_EMAIL = "ci@pretronic.net"
 final String COMMIT_MESSAGE = "Version change %version%"
 
-final String RESOURCE_ID = "e5b65750-4dcc-4631-b275-06113b31a416"
+final String RESOURCE_ID = "22ce19f7-9ae8-45ef-9c09-659fc4c9a841"
 
 final String BRANCH_DEVELOPMENT = "development"
-final String BRANCH_BETA = "beta"
+final String BRANCH_BETA = null
 final String BRANCH_MASTER = "master"
 
-String PROJECT_NAME = "McNative"
+String PROJECT_NAME = "McNativeBungeeCord"
 
-boolean JAVADOCS_ENABLED = true
+boolean JAVADOCS_ENABLED = false
 String JAVADOCS_NAME = "mcnative"
 String JAVADOCS_MODULES = ":McNative,:mcnative-common,:mcnative-service,:mcnative-proxy,:mcnative-licensing"
 
 def MIRROR_SERVER_PUBLISHING = [
-        "mcnative-bungeecord/target/mcnative-bungeecord-%version%.jar": "bungeecord",
-        "mcnative-bukkit/target/mcnative-bukkit-%version%.jar": "bukkit",
+        "target/McNativeBungeeCord-%version%.jar": "default",
 ]
 
 String MAVEN_SETTINGS_FILE_ID = "afe25550-309e-40c1-80ad-59da7989fb4e"

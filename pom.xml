@@ -23,9 +23,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.mcnative</groupId>
-    <artifactId>McNative</artifactId>
-    <packaging>pom</packaging>
+    <groupId>org.mcnative.bungeecord</groupId>
+    <artifactId>McNativeBungeeCord</artifactId>
     <version>1.7.75.489-SNAPSHOT</version>
 
     <distributionManagement>
@@ -45,32 +44,19 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Dependency version -->
-        <dependency.bungeecord.version>1.16-R0.4-SNAPSHOT</dependency.bungeecord.version>
-        <dependency.bukkit.version>1.14.2-R0.1-SNAPSHOT</dependency.bukkit.version>
-        <dependency.placeholderapi.version>2.10.9</dependency.placeholderapi.version>
-        <dependency.cloudnet.v2.version>2.1.17</dependency.cloudnet.v2.version>
+        <dependency.mcnative.api>1.0.11.18-SNAPSHOT</dependency.mcnative.api>
+        <dependency.mcnative.common>1.7.79.6-SNAPSHOT</dependency.mcnative.common>
 
-        <dependency.pretronic.libraries.utility>${dependency.pretronic.libraries}</dependency.pretronic.libraries.utility>
-        <dependency.pretronic.libraries.document>${dependency.pretronic.libraries}</dependency.pretronic.libraries.document>
-        <dependency.pretronic.libraries.concurrent>${dependency.pretronic.libraries}</dependency.pretronic.libraries.concurrent>
-        <dependency.pretronic.libraries.command>${dependency.pretronic.libraries}</dependency.pretronic.libraries.command>
-        <dependency.pretronic.libraries.event>${dependency.pretronic.libraries}</dependency.pretronic.libraries.event>
-        <dependency.pretronic.libraries.plugin>${dependency.pretronic.libraries}</dependency.pretronic.libraries.plugin>
-        <dependency.pretronic.libraries.dependency>${dependency.pretronic.libraries}</dependency.pretronic.libraries.dependency>
-        <dependency.pretronic.libraries.caching>${dependency.pretronic.libraries}</dependency.pretronic.libraries.caching>
-        <dependency.pretronic.libraries.resourceloader>${dependency.pretronic.libraries}</dependency.pretronic.libraries.resourceloader>
-        <dependency.pretronic.libraries.synchronisation>${dependency.pretronic.libraries}</dependency.pretronic.libraries.synchronisation>
-        <dependency.pretronic.libraries.logging>${dependency.pretronic.libraries}</dependency.pretronic.libraries.logging>
-        <dependency.pretronic.libraries.message>${dependency.pretronic.libraries}</dependency.pretronic.libraries.message>
+        <dependency.bungeecord>1.16-R0.4-SNAPSHOT</dependency.bungeecord>
+
         <dependency.pretronic.libraries>1.2.37.175-SNAPSHOT</dependency.pretronic.libraries>
-
         <dependency.pretronic.databasequery>1.2.53.80-SNAPSHOT</dependency.pretronic.databasequery>
+
+        <dependency.cloudnet.v2>2.1.17</dependency.cloudnet.v2>
+        <dependency.cloudnet.v3>3.3.0-RELEASE</dependency.cloudnet.v3>
 
         <dependency.hikaricp>3.4.1</dependency.hikaricp>
         <dependency.slf4j>1.7.25</dependency.slf4j>
-
-        <!-- Test dependencies -->
-        <test.junit.jupiter>5.5.2</test.junit.jupiter>
 
         <!-- Maven plugins -->
         <plugin.compiler.version>3.8.1</plugin.compiler.version>
@@ -79,24 +65,146 @@
         <plugin.jar.version>3.2.0</plugin.jar.version>
     </properties>
 
-    <modules>
-        <module>mcnative-common</module>
-        <module>mcnative-network-integrations</module>
-        <module>mcnative-proxy</module>
-        <module>mcnative-service</module>
-        <module>mcnative-bukkit</module>
-        <module>mcnative-bungeecord</module>
-        <module>mcnative-buildtool-maven</module>
-        <module>mcnative-loader</module>
-        <module>mcnative-build</module>
-        <module>mcnative-licensing</module>
-    </modules>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${plugin.compiler.version}</version>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${plugin.shade.version}</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${plugin.jar.version}</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Specification-Version>${dependency.mcnative.api}</Specification-Version>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.0.0-M1</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <repositories>
         <repository>
             <id>pretronic</id>
             <url>https://repository.pretronic.net/repository/pretronic/</url>
         </repository>
+        <repository>
+            <id>bungeecord-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+        <repository>
+            <id>releases</id>
+            <url>https://repo.cloudnetservice.eu/repository/releases/</url>
+        </repository>
     </repositories>
+
+    <dependencies>
+        <!-- Internal project dependencies -->
+        <dependency>
+            <groupId>org.mcnative.runtime.api</groupId>
+            <artifactId>mcnative-runtime-api-proxy</artifactId>
+            <version>${dependency.mcnative.api}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mcnative.runtime</groupId>
+            <artifactId>mcnative-runtime-common</artifactId>
+            <version>${dependency.mcnative.common}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mcnative.runtime</groupId>
+            <artifactId>mcnative-runtime-protocol-java</artifactId>
+            <version>${dependency.mcnative.common}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mcnative.runtime</groupId>
+            <artifactId>mcnative-runtime-network-integrations</artifactId>
+            <version>${dependency.mcnative.common}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Runtime Platform dependencies -->
+
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-api</artifactId>
+            <version>${dependency.bungeecord}</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-protocol</artifactId>
+            <version>${dependency.bungeecord}</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>de.dytanic.cloudnet</groupId>
+            <artifactId>cloudnet-api-bridge</artifactId>
+            <version>${dependency.cloudnet.v2}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>de.dytanic.cloudnet</groupId>
+            <artifactId>cloudnet-wrapper-jvm</artifactId>
+            <version>${dependency.cloudnet.v3}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>de.dytanic.cloudnet</groupId>
+            <artifactId>cloudnet-bridge</artifactId>
+            <version>${dependency.cloudnet.v3}</version>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
 
 </project>
