@@ -141,7 +141,7 @@ public class BungeeCordMcNative implements McNative {
 
     @Override
     public McNativeConsoleCredentials getConsoleCredentials() {
-        return new McNativeConsoleCredentials(McNativeBungeeCordConfiguration.SERVER_ID,McNativeBungeeCordConfiguration.SERVER_SECRET);
+        return new McNativeConsoleCredentials(McNativeBungeeCordConfiguration.CONSOLE_NETWORK_ID,McNativeBungeeCordConfiguration.CONSOLE_SECRET);
     }
 
     @Override

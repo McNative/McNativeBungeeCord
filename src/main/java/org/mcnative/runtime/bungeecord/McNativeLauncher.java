@@ -59,6 +59,7 @@ import org.mcnative.runtime.common.protocol.DefaultPacketManager;
 import org.mcnative.runtime.common.serviceprovider.message.ResourceMessageExtractor;
 import org.mcnative.runtime.network.integrations.cloudnet.v2.CloudNetV2Network;
 import org.mcnative.runtime.network.integrations.cloudnet.v3.CloudNetV3Network;
+import org.mcnative.runtime.protocol.java.MinecraftJavaProtocol;
 
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -112,6 +113,8 @@ public class McNativeLauncher {
                 ,new DefaultEventBus(new NetworkEventHandler())
                 ,serverMap);
 
+        MinecraftJavaProtocol.register(localService.getPacketManager());
+
         BungeeCordMcNative instance = new BungeeCordMcNative(apiVersion,implementationVersion,pluginManager
                 ,playerManager,null, localService);
         McNative.setInstance(instance);
@@ -141,7 +144,7 @@ public class McNativeLauncher {
 
         ResourceMessageExtractor.extractMessages(McNativeLauncher.class.getClassLoader(),"system-messages/","McNative");
 
-        if(McNativeBungeeCordConfiguration.MAF_ENABLED && !McNativeBungeeCordConfiguration.SERVER_ID.equals("00000-00000-00000")){
+        if(McNativeBungeeCordConfiguration.CONSOLE_MAF_ENABLED && !McNativeBungeeCordConfiguration.CONSOLE_NETWORK_ID.equals("00000-00000-00000")){
             MAFService.start();
         }
 
@@ -231,5 +234,4 @@ public class McNativeLauncher {
             McNativeLauncher.shutdown();
         }
     }
-
 }

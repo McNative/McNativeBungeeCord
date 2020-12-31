@@ -51,10 +51,14 @@ public class McNativeBungeeCordConfiguration {
     @DocumentKey("debug")
     public static boolean DEBUG = false;
 
-    public static String SERVER_ID = "00000-00000-00000";
-    public static String SERVER_SECRET = "00000-00000-00000";
+    @DocumentKey("console.networkId")
+    public static String CONSOLE_NETWORK_ID = "00000-00000-00000";
 
-    public static boolean MAF_ENABLED = true;
+    @DocumentKey("console.secret")
+    public static String CONSOLE_SECRET = "00000-00000-00000";
+
+    @DocumentKey("console.mafEnabled")
+    public static boolean CONSOLE_MAF_ENABLED = true;
 
     @DocumentIgnored
     public static Map<String,ConfiguredServer> SERVER_SERVERS = new HashMap<>();

@@ -23,9 +23,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.mcnative.bungeecord</groupId>
+    <groupId>org.mcnative.runtime.bungeecord</groupId>
     <artifactId>McNativeBungeeCord</artifactId>
-    <version>1.7.75.4</version>
+    <version>1.7.80.11-BETA</version>
 
     <distributionManagement>
         <repository>
@@ -45,7 +45,8 @@
 
         <!-- Dependency version -->
         <dependency.mcnative.api>1.0.11.18-SNAPSHOT</dependency.mcnative.api>
-        <dependency.mcnative.common>1.7.79.6-SNAPSHOT</dependency.mcnative.common>
+        <dependency.mcnative.common>1.7.84.11-SNAPSHOT</dependency.mcnative.common>
+        <dependency.netty>4.1.56.Final</dependency.netty>
 
         <dependency.bungeecord>1.16-R0.4-SNAPSHOT</dependency.bungeecord>
 
@@ -138,6 +139,13 @@
 
     <dependencies>
         <!-- Internal project dependencies -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-kqueue</artifactId>
+            <version>${dependency.netty}</version>
+            <scope>compile</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.mcnative.runtime.api</groupId>
             <artifactId>mcnative-runtime-api-proxy</artifactId>

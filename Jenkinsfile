@@ -9,7 +9,7 @@ final String COMMIT_MESSAGE = "Version change %version%"
 final String RESOURCE_ID = "22ce19f7-9ae8-45ef-9c09-659fc4c9a841"
 
 final String BRANCH_DEVELOPMENT = "development"
-final String BRANCH_BETA = null
+final String BRANCH_BETA = "beta"
 final String BRANCH_MASTER = "master"
 
 String PROJECT_NAME = "McNativeBungeeCord"
