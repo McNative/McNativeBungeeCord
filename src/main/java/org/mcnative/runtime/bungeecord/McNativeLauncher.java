@@ -59,6 +59,7 @@ import org.mcnative.runtime.common.protocol.DefaultPacketManager;
 import org.mcnative.runtime.common.serviceprovider.message.ResourceMessageExtractor;
 import org.mcnative.runtime.network.integrations.cloudnet.v2.CloudNetV2Network;
 import org.mcnative.runtime.network.integrations.cloudnet.v3.CloudNetV3Network;
+import org.mcnative.runtime.protocol.java.MinecraftJavaProtocol;
 
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -111,6 +112,8 @@ public class McNativeLauncher {
                 ,playerManager
                 ,new DefaultEventBus(new NetworkEventHandler())
                 ,serverMap);
+
+        MinecraftJavaProtocol.register(localService.getPacketManager());
 
         BungeeCordMcNative instance = new BungeeCordMcNative(apiVersion,implementationVersion,pluginManager
                 ,playerManager,null, localService);
