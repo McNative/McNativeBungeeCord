@@ -46,6 +46,7 @@
         <!-- Dependency version -->
         <dependency.mcnative.api>1.0.11.18-SNAPSHOT</dependency.mcnative.api>
         <dependency.mcnative.common>1.7.82.9-SNAPSHOT</dependency.mcnative.common>
+        <dependency.netty>4.1.56.Final</dependency.netty>
 
         <dependency.bungeecord>1.16-R0.4-SNAPSHOT</dependency.bungeecord>
 
@@ -138,6 +139,13 @@
 
     <dependencies>
         <!-- Internal project dependencies -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-kqueue</artifactId>
+            <version>${dependency.netty}</version>
+            <scope>compile</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.mcnative.runtime.api</groupId>
             <artifactId>mcnative-runtime-api-proxy</artifactId>
