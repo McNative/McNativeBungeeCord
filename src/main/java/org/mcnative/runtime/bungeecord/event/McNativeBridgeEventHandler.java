@@ -31,6 +31,7 @@ import net.pretronic.libraries.command.sender.CommandSender;
 import net.pretronic.libraries.event.EventBus;
 import net.pretronic.libraries.utility.SystemUtil;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
+import org.mcnative.runtime.api.event.player.login.MinecraftPlayerLoginConfirmEvent;
 import org.mcnative.runtime.bungeecord.event.player.*;
 import org.mcnative.runtime.bungeecord.event.server.BungeeServerConnectEvent;
 import org.mcnative.runtime.bungeecord.event.server.BungeeServerConnectedEvent;
@@ -68,6 +69,7 @@ import org.mcnative.runtime.api.proxy.event.player.MinecraftPlayerServerKickEven
 import org.mcnative.runtime.api.serviceprovider.permission.Permissable;
 import org.mcnative.runtime.api.serviceprovider.permission.PermissionHandler;
 import org.mcnative.runtime.api.text.components.MessageComponent;
+import org.mcnative.runtime.common.event.player.DefaultMinecraftPlayerLoginConfirmEvent;
 import org.mcnative.runtime.common.event.service.local.DefaultLocalServiceReloadEvent;
 
 import java.util.Arrays;
@@ -242,6 +244,8 @@ public final class McNativeBridgeEventHandler {
         ((BungeeProxiedPlayer) player).injectDownstreamProtocolHandlersToPipeline();
 
         eventBus.callEvents(ServerConnectedEvent.class,event,mcNativeEvent);
+
+        eventBus.callEvent(MinecraftPlayerLoginConfirmEvent.class, new DefaultMinecraftPlayerLoginConfirmEvent(player));
     }
 
     private void handleServerSwitch(ServerSwitchEvent event){
