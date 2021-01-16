@@ -96,12 +96,6 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
 
     @Override
     public Collection<ListenerInfo> getListeners() {
-        System.out.println("DEBUG:");
-        System.out.println(original);
-        if(original != null) {
-            System.out.println(original.getListeners());
-        }
-        System.out.println("---");
         return original.getListeners();
     }
 

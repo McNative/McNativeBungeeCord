@@ -245,7 +245,10 @@ public final class McNativeBridgeEventHandler {
 
         eventBus.callEvents(ServerConnectedEvent.class,event,mcNativeEvent);
 
-        eventBus.callEvent(MinecraftPlayerLoginConfirmEvent.class, new DefaultMinecraftPlayerLoginConfirmEvent(player));
+        if(((BungeeProxiedPlayer)player).isFirstJoin()) {
+            eventBus.callEvent(MinecraftPlayerLoginConfirmEvent.class, new DefaultMinecraftPlayerLoginConfirmEvent(player));
+            ((BungeeProxiedPlayer)player).setFirstJoin(false);
+        }
     }
 
     private void handleServerSwitch(ServerSwitchEvent event){
