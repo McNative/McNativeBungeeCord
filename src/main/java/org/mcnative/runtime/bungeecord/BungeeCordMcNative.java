@@ -95,11 +95,12 @@ public class BungeeCordMcNative implements McNative {
     private final DependencyManager dependencyManager;
     private final PlayerManager playerManager;
     private final LocalService local;
+    private final McNativeConsoleCredentials consoleCredentials;
 
     private Network network;
     private boolean ready;
 
-    public BungeeCordMcNative(PluginVersion apiVersion,PluginVersion implVersion,PluginManager pluginManager, PlayerManager playerManager, Network network, LocalService local) {
+    public BungeeCordMcNative(PluginVersion apiVersion,PluginVersion implVersion,PluginManager pluginManager, PlayerManager playerManager, LocalService local,Collection<Env> variables, McNativeConsoleCredentials consoleCredentials) {
         this.implementationVersion = implVersion;
         this.apiVersion = apiVersion;
         this.platform = new BungeeCordPlatform();
@@ -119,11 +120,11 @@ public class BungeeCordMcNative implements McNative {
         this.consoleSender = new McNativeCommand.MappedCommandSender(ProxyServer.getInstance().getConsole());
         this.dependencyManager = new DependencyManager(logger,new File("plugins/McNative/lib/dependencies"));
         this.factory = new DefaultObjectFactory();
-        this.variables = new ArrayList<>();
+        this.variables = variables;
+        this.consoleCredentials = consoleCredentials;
 
         this.pluginManager = pluginManager;
         this.playerManager = playerManager;
-        this.network = network;
         this.local = local;
 
         this.loaderConfiguration = DefaultLoaderConfiguration.load(new File("plugins/McNative/update.yml"));
@@ -147,7 +148,7 @@ public class BungeeCordMcNative implements McNative {
 
     @Override
     public McNativeConsoleCredentials getConsoleCredentials() {
-        return new McNativeConsoleCredentials(McNativeBungeeCordConfiguration.CONSOLE_NETWORK_ID,McNativeBungeeCordConfiguration.CONSOLE_SECRET);
+        return this.consoleCredentials;
     }
 
     @Override
