@@ -254,9 +254,6 @@ public class BungeeCordService implements LocalService, ProxyServer, ProxyServic
 
     @Override
     public String getName() {
-        if(McNative.getInstance().isNetworkAvailable()){
-            return McNative.getInstance().getNetwork().getLocalIdentifier().getName();
-        }
         return net.md_5.bungee.api.ProxyServer.getInstance().getName();
     }
 
