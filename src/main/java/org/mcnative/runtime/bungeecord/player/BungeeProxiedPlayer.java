@@ -90,10 +90,13 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
 
     private ChatChannel chatChannel;
 
+    private boolean firstJoin;
+
     public BungeeProxiedPlayer(BungeeCordServerMap serverMap,BungeePendingConnection connection, MinecraftPlayerData playerData) {
         super(playerData);
         this.serverMap = serverMap;
         this.connection = connection;
+        this.firstJoin = true;
     }
 
     @Internal
@@ -508,6 +511,16 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
         if(this.server instanceof WrappedBungeeMinecraftServer){
             ((WrappedBungeeMinecraftServer) server).removePlayer(this);
         }
+    }
+
+    @Internal
+    public boolean isFirstJoin() {
+        return firstJoin;
+    }
+
+    @Internal
+    public void setFirstJoin(boolean firstJoin) {
+        this.firstJoin = firstJoin;
     }
 }
 

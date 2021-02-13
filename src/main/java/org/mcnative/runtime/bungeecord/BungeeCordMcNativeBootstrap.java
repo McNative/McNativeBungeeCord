@@ -21,12 +21,14 @@ package org.mcnative.runtime.bungeecord;
 
 import net.md_5.bungee.api.plugin.Plugin;
 
+import java.util.ArrayList;
+
 public class BungeeCordMcNativeBootstrap extends Plugin {
 
     @Override
     public void onLoad() {
         try{
-            McNativeLauncher.launchMcNativeInternal(this);
+            McNativeLauncher.launchMcNativeInternal(new ArrayList<>(),this);
         }catch (Exception exception){
             exception.printStackTrace();
             getLogger().info("Could not bootstrap McNative ("+exception.getMessage()+")");
