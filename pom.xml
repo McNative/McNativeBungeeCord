@@ -27,6 +27,7 @@
     <artifactId>McNativeBungeeCord</artifactId>
     <version>1.9.12.33-BETA</version>
 
+
     <distributionManagement>
         <repository>
             <id>pretronic</id>
