@@ -30,10 +30,13 @@ import net.pretronic.libraries.document.DocumentRegistry;
 import net.pretronic.libraries.event.DefaultEventBus;
 import net.pretronic.libraries.logging.bridge.JdkPretronicLogger;
 import net.pretronic.libraries.plugin.description.PluginVersion;
+import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.interfaces.ObjectOwner;
 import net.pretronic.libraries.utility.reflect.ReflectException;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import net.pretronic.libraries.utility.reflect.UnsafeInstanceCreator;
+import org.mcnative.runtime.api.McNativeConsoleCredentials;
+import org.mcnative.runtime.api.utils.Env;
 import org.mcnative.runtime.bungeecord.event.McNativeBridgeEventHandler;
 import org.mcnative.runtime.bungeecord.network.McNativeGlobalActionListener;
 import org.mcnative.runtime.bungeecord.network.McNativePlayerActionListener;
@@ -63,6 +66,8 @@ import org.mcnative.runtime.protocol.java.MinecraftJavaProtocol;
 
 import javax.imageio.ImageIO;
 import java.io.File;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Logger;
@@ -76,10 +81,15 @@ public class McNativeLauncher {
     }
 
     public static void launchMcNative(){
-        launchMcNativeInternal(setupDummyPlugin());
+        launchMcNative(new HashMap<>());
     }
 
-    public static void launchMcNativeInternal(Plugin plugin){
+    public static void launchMcNative(Map<String,String> variables0){
+        Collection<Env> variables = Iterators.map(variables0.entrySet(), entry -> new Env(entry.getKey().toLowerCase(),entry.getValue()));
+        launchMcNativeInternal(variables,setupDummyPlugin());
+    }
+
+    public static void launchMcNativeInternal(Collection<Env> variables,Plugin plugin){
         if(McNative.isAvailable()) return;
         PluginVersion apiVersion = PluginVersion.parse(McNativeLauncher.class.getPackage().getSpecificationVersion());
         PluginVersion implementationVersion = PluginVersion.ofImplementation(McNativeLauncher.class);
@@ -115,8 +125,9 @@ public class McNativeLauncher {
 
         MinecraftJavaProtocol.register(localService.getPacketManager());
 
+        McNativeConsoleCredentials credentials = setupCredentials(variables);
         BungeeCordMcNative instance = new BungeeCordMcNative(apiVersion,implementationVersion,pluginManager
-                ,playerManager,null, localService);
+                ,playerManager, localService,variables,credentials);
         McNative.setInstance(instance);
         instance.setNetwork(setupNetwork(logger,localService,instance.getExecutorService(),serverMap));
 
@@ -144,11 +155,22 @@ public class McNativeLauncher {
 
         ResourceMessageExtractor.extractMessages(McNativeLauncher.class.getClassLoader(),"system-messages/","McNative");
 
-        if(McNativeBungeeCordConfiguration.CONSOLE_MAF_ENABLED && !McNativeBungeeCordConfiguration.CONSOLE_NETWORK_ID.equals("00000-00000-00000")){
+        if(McNativeBungeeCordConfiguration.CONSOLE_MAF_ENABLED && McNative.getInstance().getConsoleCredentials() != null){
             MAFService.start();
         }
 
         logger.info(McNative.CONSOLE_PREFIX+"McNative successfully started.");
+    }
+
+    private static McNativeConsoleCredentials setupCredentials(Collection<Env> variables){
+        Env networkId = Iterators.findOne(variables, env -> env.getName().equalsIgnoreCase("mcnative.networkId"));
+        Env secret = Iterators.findOne(variables, env -> env.getName().equalsIgnoreCase("mcnative.secret"));
+        if(networkId != null && secret != null){
+            return new McNativeConsoleCredentials(networkId.getValue().toString(),secret.getValue().toString());
+        }else if(!McNativeBungeeCordConfiguration.CONSOLE_NETWORK_ID.equals("00000-00000-00000")){
+            return new McNativeConsoleCredentials(McNativeBungeeCordConfiguration.CONSOLE_NETWORK_ID,McNativeBungeeCordConfiguration.CONSOLE_SECRET);
+        }
+        return null;
     }
 
     private static Network setupNetwork(Logger logger, ProxyService proxy, ExecutorService executor, BungeeCordServerMap serverMap){

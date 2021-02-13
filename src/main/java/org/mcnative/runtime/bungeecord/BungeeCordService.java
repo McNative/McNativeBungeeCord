@@ -27,6 +27,7 @@ import net.pretronic.libraries.event.EventBus;
 import net.pretronic.libraries.message.bml.variable.VariableSet;
 import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.Validate;
+import org.mcnative.runtime.api.ServerPerformance;
 import org.mcnative.runtime.bungeecord.player.BungeeCordPlayerManager;
 import org.mcnative.runtime.bungeecord.server.BungeeCordServerMap;
 import org.mcnative.runtime.api.LocalService;
@@ -60,6 +61,7 @@ public class BungeeCordService implements LocalService, ProxyServer, ProxyServic
     private ChatChannel serverChat;
     private Tablist defaultTablist;
     private ServerStatusResponse statusResponse;
+    private final ServerPerformance serverPerformance;
 
     public BungeeCordService(PacketManager packetManager, CommandManager commandManager,BungeeCordPlayerManager playerManager
             ,EventBus eventBus,BungeeCordServerMap serverMap) {
@@ -68,6 +70,7 @@ public class BungeeCordService implements LocalService, ProxyServer, ProxyServic
         this.playerManager = playerManager;
         this.eventBus = eventBus;
         this.serverMap = serverMap;
+        this.serverPerformance = new BungeecordServerPerformance();
     }
 
     @Override
@@ -181,6 +184,11 @@ public class BungeeCordService implements LocalService, ProxyServer, ProxyServic
     }
 
     @Override
+    public ServerPerformance getServerPerformance() {
+        return this.serverPerformance;
+    }
+
+    @Override
     public InetSocketAddress getAddress() {
         for (ListenerInfo listener : net.md_5.bungee.api.ProxyServer.getInstance().getConfigurationAdapter().getListeners()){
             return (InetSocketAddress) listener.getSocketAddress();
@@ -246,9 +254,6 @@ public class BungeeCordService implements LocalService, ProxyServer, ProxyServic
 
     @Override
     public String getName() {
-        if(McNative.getInstance().isNetworkAvailable()){
-            return McNative.getInstance().getNetwork().getLocalIdentifier().getName();
-        }
         return net.md_5.bungee.api.ProxyServer.getInstance().getName();
     }
 

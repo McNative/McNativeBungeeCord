@@ -42,7 +42,10 @@ import net.pretronic.libraries.plugin.loader.DefaultPluginLoader;
 import net.pretronic.libraries.plugin.manager.PluginManager;
 import net.pretronic.libraries.plugin.service.ServiceRegistry;
 import net.pretronic.libraries.utility.GeneralUtil;
+import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.Validate;
+import org.mcnative.runtime.api.loader.LoaderConfiguration;
+import org.mcnative.runtime.api.utils.Env;
 import org.mcnative.runtime.bungeecord.player.BungeeProxiedPlayer;
 import org.mcnative.runtime.bungeecord.player.permission.BungeeCordPermissionProvider;
 import org.mcnative.runtime.bungeecord.player.permission.BungeeCordPlayerDesign;
@@ -58,12 +61,11 @@ import org.mcnative.runtime.api.player.PlayerManager;
 import org.mcnative.runtime.api.player.data.PlayerDataProvider;
 import org.mcnative.runtime.api.plugin.MinecraftPlugin;
 import org.mcnative.runtime.api.plugin.configuration.ConfigurationProvider;
-import org.mcnative.runtime.api.rollout.RolloutConfiguration;
 import org.mcnative.runtime.api.serviceprovider.permission.PermissionProvider;
 import org.mcnative.runtime.api.serviceprovider.placeholder.PlaceholderProvider;
 import org.mcnative.runtime.api.text.format.ColoredString;
+import org.mcnative.runtime.common.DefaultLoaderConfiguration;
 import org.mcnative.runtime.common.DefaultObjectFactory;
-import org.mcnative.runtime.common.DefaultRolloutConfiguration;
 import org.mcnative.runtime.common.player.OfflineMinecraftPlayer;
 import org.mcnative.runtime.common.player.data.DefaultPlayerDataProvider;
 import org.mcnative.runtime.common.plugin.configuration.DefaultConfigurationProvider;
@@ -71,6 +73,8 @@ import org.mcnative.runtime.common.serviceprovider.McNativePlaceholderProvider;
 import org.mcnative.runtime.common.serviceprovider.message.DefaultMessageProvider;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
@@ -84,17 +88,19 @@ public class BungeeCordMcNative implements McNative {
     private final TaskScheduler scheduler;
     private final CommandSender consoleSender;
     private final ObjectFactory factory;
-    private final RolloutConfiguration rolloutConfiguration;
+    private final LoaderConfiguration loaderConfiguration;
+    private final Collection<Env> variables;
 
     private final PluginManager pluginManager;
     private final DependencyManager dependencyManager;
     private final PlayerManager playerManager;
     private final LocalService local;
+    private final McNativeConsoleCredentials consoleCredentials;
 
     private Network network;
     private boolean ready;
 
-    public BungeeCordMcNative(PluginVersion apiVersion,PluginVersion implVersion,PluginManager pluginManager, PlayerManager playerManager, Network network, LocalService local) {
+    public BungeeCordMcNative(PluginVersion apiVersion,PluginVersion implVersion,PluginManager pluginManager, PlayerManager playerManager, LocalService local,Collection<Env> variables, McNativeConsoleCredentials consoleCredentials) {
         this.implementationVersion = implVersion;
         this.apiVersion = apiVersion;
         this.platform = new BungeeCordPlatform();
@@ -114,13 +120,14 @@ public class BungeeCordMcNative implements McNative {
         this.consoleSender = new McNativeCommand.MappedCommandSender(ProxyServer.getInstance().getConsole());
         this.dependencyManager = new DependencyManager(logger,new File("plugins/McNative/lib/dependencies"));
         this.factory = new DefaultObjectFactory();
+        this.variables = variables;
+        this.consoleCredentials = consoleCredentials;
 
         this.pluginManager = pluginManager;
         this.playerManager = playerManager;
-        this.network = network;
         this.local = local;
 
-        this.rolloutConfiguration = DefaultRolloutConfiguration.load(new File("plugins/McNative/update.yml"));
+        this.loaderConfiguration = DefaultLoaderConfiguration.load(new File("plugins/McNative/update.yml"));
         SLF4JStaticBridge.trySetLogger(logger);
     }
 
@@ -135,13 +142,37 @@ public class BungeeCordMcNative implements McNative {
     }
 
     @Override
-    public RolloutConfiguration getRolloutConfiguration() {
-        return this.rolloutConfiguration;
+    public LoaderConfiguration getRolloutConfiguration() {
+        return this.loaderConfiguration;
     }
 
     @Override
     public McNativeConsoleCredentials getConsoleCredentials() {
-        return new McNativeConsoleCredentials(McNativeBungeeCordConfiguration.CONSOLE_NETWORK_ID,McNativeBungeeCordConfiguration.CONSOLE_SECRET);
+        return this.consoleCredentials;
+    }
+
+    @Override
+    public Collection<Env> getVariables() {
+        return variables;
+    }
+
+    @Override
+    public Env getVariable(String name) {
+        Validate.notNull(name);
+        return Iterators.findOne(this.variables, env -> env.getName().equalsIgnoreCase(name));
+    }
+
+    @Override
+    public boolean hasVariable(String name) {
+        Validate.notNull(name);
+        return getVariable(name) != null;
+    }
+
+    @Override
+    public void setVariable(String name, Object value) {
+        Validate.notNull(name);
+        Iterators.remove(this.variables, env -> env.getName().equalsIgnoreCase(name));
+        if(value != null) this.variables.add(new Env(name,value));
     }
 
     @Override
