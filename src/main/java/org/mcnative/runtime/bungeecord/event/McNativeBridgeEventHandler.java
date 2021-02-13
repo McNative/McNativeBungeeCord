@@ -277,7 +277,7 @@ public final class McNativeBridgeEventHandler {
         if(player instanceof BungeeProxiedPlayer) ((BungeeProxiedPlayer) player).handleLogout();
         MinecraftPlayerLogoutEvent mcNativeEvent = new BungeeMinecraftLogoutEvent(player);
         eventBus.callEvents(PlayerDisconnectEvent.class,event,mcNativeEvent);
-        SystemUtil.sleepUninterruptible(700);//Sleep for security reasons
+        //SystemUtil.sleepUninterruptible(700);//Sleep for security reasons
         playerManager.unregisterPlayer(event.getPlayer().getUniqueId());
     }
 
