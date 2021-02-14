@@ -50,7 +50,7 @@ public class CloudNetV3PlatformListener implements Listener {
         this.messenger.handleMessageEvent(event.getChannel(),event.getMessage(),event.getData());
     }
 
-    //@EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerPostLogin(PostLoginEvent event){
         if(event.getPlayer().getServer() == null){
             ProxiedPlayer player = event.getPlayer();
@@ -66,10 +66,4 @@ public class CloudNetV3PlatformListener implements Listener {
         }
     }
 
-    //@EventHandler(priority = EventPriority.HIGHEST)
-    public void handle(PlayerDisconnectEvent event) {
-        BridgeHelper.sendChannelMessageProxyDisconnect(BungeeCloudNetHelper.createNetworkConnectionInfo(event.getPlayer().getPendingConnection()));
-        BridgeProxyHelper.clearFallbackProfile(event.getPlayer().getUniqueId());
-        ProxyServer.getInstance().getScheduler().schedule(McNativeLauncher.getPlugin(), BridgeHelper::updateServiceInfo, 150, TimeUnit.MILLISECONDS);
-    }
 }
