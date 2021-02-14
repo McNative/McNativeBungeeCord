@@ -20,22 +20,15 @@
 
 package org.mcnative.runtime.bungeecord.network.cloudnet;
 
-import de.dytanic.cloudnet.ext.bridge.BridgeHelper;
-import de.dytanic.cloudnet.ext.bridge.bungee.BungeeCloudNetHelper;
 import de.dytanic.cloudnet.ext.bridge.bungee.event.BungeeChannelMessageReceiveEvent;
 import de.dytanic.cloudnet.ext.bridge.proxy.BridgeProxyHelper;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.event.PlayerDisconnectEvent;
-import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.PreLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 import org.mcnative.runtime.bungeecord.McNativeLauncher;
 import org.mcnative.runtime.network.integrations.cloudnet.v3.CloudNetV3Messenger;
-
-import java.util.concurrent.TimeUnit;
 
 public class CloudNetV3PlatformListener implements Listener {
 
@@ -54,7 +47,7 @@ public class CloudNetV3PlatformListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerPostLogin(PreLoginEvent event){
         boolean available = BridgeProxyHelper.getFallbacks().count() > 0;
-        if(true){
+        if(available){
             event.setCancelled(true);
             event.setCancelReason(ProxyServer.getInstance().getTranslation("fallback_kick","No servers avaialble"));
         }
