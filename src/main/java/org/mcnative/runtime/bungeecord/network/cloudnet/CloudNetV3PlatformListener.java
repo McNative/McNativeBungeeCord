@@ -47,7 +47,7 @@ public class CloudNetV3PlatformListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerPostLogin(PreLoginEvent event){
         boolean available = BridgeProxyHelper.getFallbacks().count() > 0;
-        if(available){
+        if(!available){
             event.setCancelled(true);
             event.setCancelReason(ProxyServer.getInstance().getTranslation("fallback_kick","No servers avaialble"));
         }
