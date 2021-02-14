@@ -21,7 +21,6 @@
 package org.mcnative.runtime.bungeecord.network.cloudnet;
 
 import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
-import de.dytanic.cloudnet.ext.bridge.ProxyFallback;
 import de.dytanic.cloudnet.ext.bridge.bungee.event.BungeeChannelMessageReceiveEvent;
 import de.dytanic.cloudnet.ext.bridge.proxy.BridgeProxyHelper;
 import de.dytanic.cloudnet.ext.bridge.proxy.PlayerFallback;
@@ -32,8 +31,6 @@ import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 import org.mcnative.runtime.bungeecord.McNativeLauncher;
 import org.mcnative.runtime.network.integrations.cloudnet.v3.CloudNetV3Messenger;
-
-import java.util.function.Predicate;
 
 public class CloudNetV3PlatformListener implements Listener {
 
