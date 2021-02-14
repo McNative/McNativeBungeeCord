@@ -28,6 +28,7 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
+import net.md_5.bungee.api.event.PreLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
@@ -51,18 +52,11 @@ public class CloudNetV3PlatformListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerPostLogin(PostLoginEvent event){
-        if(event.getPlayer().getServer() == null){
-            ProxiedPlayer player = event.getPlayer();
-            boolean available = BridgeProxyHelper.getNextFallback(player.getUniqueId(), "null", player::hasPermission).isPresent();
-            if(!available){
-                event.getPlayer().disconnect(ProxyServer.getInstance().getTranslation("fallback_kick"));
-                ProxyServer.getInstance().getScheduler().schedule(McNativeLauncher.getPlugin(), () -> {
-                    BridgeHelper.sendChannelMessageProxyDisconnect(BungeeCloudNetHelper.createNetworkConnectionInfo(event.getPlayer().getPendingConnection()));
-                    BridgeProxyHelper.clearFallbackProfile(event.getPlayer().getUniqueId());
-                    ProxyServer.getInstance().getScheduler().schedule(McNativeLauncher.getPlugin(), BridgeHelper::updateServiceInfo, 150, TimeUnit.MILLISECONDS);
-                }, 250L, TimeUnit.MILLISECONDS);
-            }
+    public void onPlayerPostLogin(PreLoginEvent event){
+        boolean available = BridgeProxyHelper.getFallbacks().count() > 0;
+        if(true){
+            event.setCancelled(true);
+            event.setCancelReason(ProxyServer.getInstance().getTranslation("fallback_kick","No servers avaialble"));
         }
     }
 
