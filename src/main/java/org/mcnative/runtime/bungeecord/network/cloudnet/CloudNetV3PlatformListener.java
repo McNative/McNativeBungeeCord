@@ -20,8 +20,11 @@
 
 package org.mcnative.runtime.bungeecord.network.cloudnet;
 
+import de.dytanic.cloudnet.ext.bridge.BridgeServiceProperty;
+import de.dytanic.cloudnet.ext.bridge.ProxyFallback;
 import de.dytanic.cloudnet.ext.bridge.bungee.event.BungeeChannelMessageReceiveEvent;
 import de.dytanic.cloudnet.ext.bridge.proxy.BridgeProxyHelper;
+import de.dytanic.cloudnet.ext.bridge.proxy.PlayerFallback;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.event.PreLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -29,6 +32,8 @@ import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 import org.mcnative.runtime.bungeecord.McNativeLauncher;
 import org.mcnative.runtime.network.integrations.cloudnet.v3.CloudNetV3Messenger;
+
+import java.util.function.Predicate;
 
 public class CloudNetV3PlatformListener implements Listener {
 
@@ -46,7 +51,10 @@ public class CloudNetV3PlatformListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerPostLogin(PreLoginEvent event){
-        boolean available = BridgeProxyHelper.getFallbacks().count() > 0;
+        boolean available = BridgeProxyHelper.getFallbacks()
+                .flatMap(proxyFallback -> BridgeProxyHelper.getCachedServiceInfoSnapshots(proxyFallback.getTask())
+                        .map(serviceInfoSnapshot -> new PlayerFallback(proxyFallback.getPriority(), serviceInfoSnapshot)))
+                .anyMatch(fallback -> fallback.getTarget().getProperty(BridgeServiceProperty.IS_ONLINE).orElse(false));
         if(!available){
             event.setCancelled(true);
             event.setCancelReason(ProxyServer.getInstance().getTranslation("fallback_kick","No servers avaialble"));
