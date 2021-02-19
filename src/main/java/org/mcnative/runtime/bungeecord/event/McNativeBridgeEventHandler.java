@@ -29,6 +29,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.*;
 import net.pretronic.libraries.command.sender.CommandSender;
 import net.pretronic.libraries.event.EventBus;
+import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.SystemUtil;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.mcnative.runtime.api.event.player.login.MinecraftPlayerLoginConfirmEvent;
@@ -76,6 +77,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 public final class McNativeBridgeEventHandler {
 
@@ -168,14 +170,12 @@ public final class McNativeBridgeEventHandler {
     }
 
     private void handleLogin(LoginEvent event){
-        System.out.println("START LOGIN");
         BungeePendingConnection connection = new BungeePendingConnection(event.getConnection());
         connection.setState(ConnectionState.LOGIN);
 
         MinecraftPlayerPendingLoginEvent pendingEvent = new BungeeMinecraftPendingLoginEvent(connection);
         eventBus.callEvent(MinecraftPlayerPendingLoginEvent.class,pendingEvent);
         if(pendingEvent.isCancelled()){
-            System.out.println("CANCELLED LOGIN");
             connection.disconnect(pendingEvent.getCancelReason(),pendingEvent.getCancelReasonVariables());
             return;
         }
@@ -207,7 +207,6 @@ public final class McNativeBridgeEventHandler {
             connection.setPlayer(player);
             pendingPlayers.put(player.getUniqueId(),player);
         }
-        System.out.println("DONE LOGIN");
     }
 
     private void handlePostLogin(PostLoginEvent event){
@@ -262,8 +261,9 @@ public final class McNativeBridgeEventHandler {
     }
 
     private void handleServerKick(ServerKickEvent event){
-        System.out.println("SERVER KICK");
-        ConnectedMinecraftPlayer player = playerManager.getMappedPlayer(event.getPlayer());
+        ConnectedMinecraftPlayer player = this.pendingPlayers.get(event.getPlayer().getUniqueId());
+        if(player == null) player = playerManager.getMappedPlayer(event.getPlayer());
+
         MinecraftPlayerServerKickEvent mcNativeEvent = new BungeeServerKickEvent(serverMap,event,player);
         ServerConnectHandler handler = McNative.getInstance().getRegistry().getServiceOrDefault(ServerConnectHandler.class);
         if(handler != null){
