@@ -168,12 +168,14 @@ public final class McNativeBridgeEventHandler {
     }
 
     private void handleLogin(LoginEvent event){
+        System.out.println("START LOGIN");
         BungeePendingConnection connection = new BungeePendingConnection(event.getConnection());
         connection.setState(ConnectionState.LOGIN);
 
         MinecraftPlayerPendingLoginEvent pendingEvent = new BungeeMinecraftPendingLoginEvent(connection);
         eventBus.callEvent(MinecraftPlayerPendingLoginEvent.class,pendingEvent);
         if(pendingEvent.isCancelled()){
+            System.out.println("CANCELLED LOGIN");
             connection.disconnect(pendingEvent.getCancelReason(),pendingEvent.getCancelReasonVariables());
             return;
         }
@@ -205,6 +207,7 @@ public final class McNativeBridgeEventHandler {
             connection.setPlayer(player);
             pendingPlayers.put(player.getUniqueId(),player);
         }
+        System.out.println("DONE LOGIN");
     }
 
     private void handlePostLogin(PostLoginEvent event){
@@ -259,6 +262,7 @@ public final class McNativeBridgeEventHandler {
     }
 
     private void handleServerKick(ServerKickEvent event){
+        System.out.println("SERVER KICK");
         ConnectedMinecraftPlayer player = playerManager.getMappedPlayer(event.getPlayer());
         MinecraftPlayerServerKickEvent mcNativeEvent = new BungeeServerKickEvent(serverMap,event,player);
         ServerConnectHandler handler = McNative.getInstance().getRegistry().getServiceOrDefault(ServerConnectHandler.class);
@@ -277,7 +281,6 @@ public final class McNativeBridgeEventHandler {
         if(player instanceof BungeeProxiedPlayer) ((BungeeProxiedPlayer) player).handleLogout();
         MinecraftPlayerLogoutEvent mcNativeEvent = new BungeeMinecraftLogoutEvent(player);
         eventBus.callEvents(PlayerDisconnectEvent.class,event,mcNativeEvent);
-        //SystemUtil.sleepUninterruptible(700);//Sleep for security reasons
         playerManager.unregisterPlayer(event.getPlayer().getUniqueId());
     }
 
