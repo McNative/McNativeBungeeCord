@@ -128,6 +128,7 @@ public class McNativeLauncher {
         McNativeConsoleCredentials credentials = setupCredentials(variables);
         BungeeCordMcNative instance = new BungeeCordMcNative(apiVersion,implementationVersion,pluginManager
                 ,playerManager, localService,variables,credentials);
+
         McNative.setInstance(instance);
         instance.setNetwork(setupNetwork(logger,localService,instance.getExecutorService(),serverMap));
 
