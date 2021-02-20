@@ -120,7 +120,7 @@ public class McNativeLauncher {
 
         BungeeCordService localService = new BungeeCordService(new DefaultPacketManager()
                 ,commandManager,playerManager
-                ,new DefaultEventBus(new DefaultEventBus.NetworkEventHandler())
+                ,new DefaultEventBus(new NetworkEventHandler())
                 ,serverMap);
 
         MinecraftJavaProtocol.register(localService.getPacketManager());
