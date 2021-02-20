@@ -119,30 +119,8 @@ public class McNativeLauncher {
         logger.info(McNative.CONSOLE_PREFIX+"McNative initialised and injected command manager.");
 
         BungeeCordService localService = new BungeeCordService(new DefaultPacketManager()
-                ,commandManager
-                ,playerManager
-                ,new DefaultEventBus(new DefaultEventBus.NetworkEventHandler(){
-
-                    private final NetworkEventHandler handler = new NetworkEventHandler();
-            @Override
-            public EventOrigin getLocal() {
-                System.out.println("[DEBUG] GET LOCAL");
-                return handler.getLocal();
-            }
-
-            @Override
-            public boolean isNetworkEvent(Class<?> executionClass) {
-                boolean result = handler.isNetworkEvent(executionClass);
-                System.out.println("[DEBUG] "+executionClass+" | IS NETWORK EVENT |"+result);
-                return result;
-            }
-
-            @Override
-            public void handleNetworkEventsAsync(EventOrigin origin, Class<?> executionClass, Object[] events) {
-                System.out.println("[DEBUG] HANDLE NETWORK EVENT "+executionClass);
-                super.handleNetworkEventsAsync(origin, executionClass, events);
-            }
-        })
+                ,commandManager,playerManager
+                ,new DefaultEventBus(new DefaultEventBus.NetworkEventHandler())
                 ,serverMap);
 
         MinecraftJavaProtocol.register(localService.getPacketManager());
