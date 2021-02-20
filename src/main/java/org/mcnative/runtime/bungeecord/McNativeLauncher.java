@@ -28,6 +28,7 @@ import net.pretronic.libraries.command.command.configuration.CommandConfiguratio
 import net.pretronic.libraries.command.command.configuration.DefaultCommandConfiguration;
 import net.pretronic.libraries.document.DocumentRegistry;
 import net.pretronic.libraries.event.DefaultEventBus;
+import net.pretronic.libraries.event.network.EventOrigin;
 import net.pretronic.libraries.logging.bridge.JdkPretronicLogger;
 import net.pretronic.libraries.plugin.description.PluginVersion;
 import net.pretronic.libraries.utility.Iterators;
@@ -120,7 +121,28 @@ public class McNativeLauncher {
         BungeeCordService localService = new BungeeCordService(new DefaultPacketManager()
                 ,commandManager
                 ,playerManager
-                ,new DefaultEventBus(new NetworkEventHandler())
+                ,new DefaultEventBus(new DefaultEventBus.NetworkEventHandler(){
+
+                    private final NetworkEventHandler handler = new NetworkEventHandler();
+            @Override
+            public EventOrigin getLocal() {
+                System.out.println("[DEBUG] GET LOCAL");
+                return handler.getLocal();
+            }
+
+            @Override
+            public boolean isNetworkEvent(Class<?> executionClass) {
+                boolean result = handler.isNetworkEvent(executionClass);
+                System.out.println("[DEBUG] "+executionClass+" | IS NETWORK EVENT |"+result);
+                return result;
+            }
+
+            @Override
+            public void handleNetworkEventsAsync(EventOrigin origin, Class<?> executionClass, Object[] events) {
+                System.out.println("[DEBUG] HANDLE NETWORK EVENT "+executionClass);
+                super.handleNetworkEventsAsync(origin, executionClass, events);
+            }
+        })
                 ,serverMap);
 
         MinecraftJavaProtocol.register(localService.getPacketManager());
