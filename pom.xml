@@ -44,13 +44,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Dependency version -->
-        <dependency.mcnative.api>1.0.19.26</dependency.mcnative.api>
-        <dependency.mcnative.common>1.8.6.38-SNAPSHOT</dependency.mcnative.common>
+        <dependency.mcnative.api>1.0.19.28-SNAPSHOT</dependency.mcnative.api>
+        <dependency.mcnative.common>1.8.8.40-SNAPSHOT</dependency.mcnative.common>
         <dependency.netty>4.1.56.Final</dependency.netty>
 
         <dependency.bungeecord>1.16-R0.4-SNAPSHOT</dependency.bungeecord>
 
-        <dependency.pretronic.libraries>1.2.40.178-SNAPSHOT</dependency.pretronic.libraries>
+        <dependency.pretronic.libraries>1.2.42.181-SNAPSHOT</dependency.pretronic.libraries>
         <dependency.pretronic.databasequery>1.2.53.80-SNAPSHOT</dependency.pretronic.databasequery>
 
         <dependency.cloudnet.v2>2.1.17</dependency.cloudnet.v2>
