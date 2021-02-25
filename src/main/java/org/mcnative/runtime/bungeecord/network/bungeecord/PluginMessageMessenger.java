@@ -134,7 +134,7 @@ public class PluginMessageMessenger extends AbstractMessenger implements Listene
         MinecraftProtocolUtil.writeUUID(buffer,sender);//Sender
         MinecraftProtocolUtil.writeUUID(buffer,requestId);//RequestId
         MinecraftProtocolUtil.writeString(buffer,channel);//Channel
-        MinecraftProtocolUtil.writeString(buffer,DocumentFileType.BINARY.getWriter().write(request,false));//Request
+        MinecraftProtocolUtil.writeString(buffer,DocumentFileType.CH.getWriter().write(request,false));//Request
         byte[] data = new byte[buffer.readableBytes()];
         buffer.readBytes(data);
         buffer.release();
@@ -144,7 +144,7 @@ public class PluginMessageMessenger extends AbstractMessenger implements Listene
     private byte[] writeResponse(UUID identifier,Document response) {
         ByteBuf buffer = Unpooled.directBuffer();
         MinecraftProtocolUtil.writeUUID(buffer,identifier);//Sender
-        MinecraftProtocolUtil.writeString(buffer,DocumentFileType.BINARY.getWriter().write(response,false));//Response
+        MinecraftProtocolUtil.writeString(buffer,DocumentFileType.JSON.getWriter().write(response,false));//Response
         byte[] data = new byte[buffer.readableBytes()];
         buffer.readBytes(data);
         buffer.release();
