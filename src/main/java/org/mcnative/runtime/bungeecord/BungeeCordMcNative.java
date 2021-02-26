@@ -110,13 +110,12 @@ public class BungeeCordMcNative implements McNative {
             logger0.getLogLevelTranslation().replace(LogLevel.DEBUG, Level.INFO);
             logger0.setPrefixProcessor(level -> level == LogLevel.DEBUG ? "(Debug) " : null);
         }else{
-            logger0.getLogLevelTranslation().replace(LogLevel.DEBUG, Level.FINEST);
+            logger0.getLogLevelTranslation().replace(LogLevel.DEBUG, Level.ALL);
         }
         Debug.setLogger(logger0);
         Debug.setDebugLevel(DebugLevel.NORMAL);
         Debug.setLogLevel(LogLevel.DEBUG);
         this.logger = logger0;
-
 
         this.scheduler = new SimpleTaskScheduler();
         this.consoleSender = new McNativeCommand.MappedCommandSender(ProxyServer.getInstance().getConsole());
