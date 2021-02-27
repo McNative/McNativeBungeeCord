@@ -149,8 +149,8 @@ public class BungeeCordCommandManager implements CommandManager {
 
     @Internal
     void registerCommand(Plugin plugin, net.md_5.bungee.api.plugin.Command command){
-        Validate.notNull(plugin,command);
-        this.commands.add(new BungeeCordCommand(command,pluginManager.getMappedPlugin(plugin)));
+        Validate.notNull(command);
+        this.commands.add(new BungeeCordCommand(command,plugin != null ? pluginManager.getMappedPlugin(plugin) : ObjectOwner.SYSTEM));
     }
 
     @Internal

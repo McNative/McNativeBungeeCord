@@ -25,8 +25,7 @@
 
     <groupId>org.mcnative.runtime.bungeecord</groupId>
     <artifactId>McNativeBungeeCord</artifactId>
-    <version>1.9.12.35</version>
-
+    <version>1.10.35.75-BETA</version>
 
     <distributionManagement>
         <repository>
@@ -45,14 +44,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Dependency version -->
-        <dependency.mcnative.api>1.0.19.26</dependency.mcnative.api>
-        <dependency.mcnative.common>1.7.102.30</dependency.mcnative.common>
+        <dependency.mcnative.api>1.0.36.45</dependency.mcnative.api>
+        <dependency.mcnative.common>1.8.21.53</dependency.mcnative.common>
         <dependency.netty>4.1.56.Final</dependency.netty>
 
         <dependency.bungeecord>1.16-R0.4-SNAPSHOT</dependency.bungeecord>
-
-        <dependency.pretronic.libraries>1.2.37.175-SNAPSHOT</dependency.pretronic.libraries>
-        <dependency.pretronic.databasequery>1.2.53.80-SNAPSHOT</dependency.pretronic.databasequery>
 
         <dependency.cloudnet.v2>2.1.17</dependency.cloudnet.v2>
         <dependency.cloudnet.v3>3.3.0-RELEASE</dependency.cloudnet.v3>

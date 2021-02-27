@@ -77,6 +77,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 
 public class BungeeCordMcNative implements McNative {
@@ -109,12 +110,14 @@ public class BungeeCordMcNative implements McNative {
         if(McNativeBungeeCordConfiguration.DEBUG){
             logger0.getLogLevelTranslation().replace(LogLevel.DEBUG, Level.INFO);
             logger0.setPrefixProcessor(level -> level == LogLevel.DEBUG ? "(Debug) " : null);
+        }else{
+            logger0.getLogLevelTranslation().replace(LogLevel.DEBUG, Level.ALL);
+            logger0.setCanLog(level -> level.getHeight() != LogLevel.DEBUG.getHeight());
         }
         Debug.setLogger(logger0);
         Debug.setDebugLevel(DebugLevel.NORMAL);
         Debug.setLogLevel(LogLevel.DEBUG);
         this.logger = logger0;
-
 
         this.scheduler = new SimpleTaskScheduler();
         this.consoleSender = new McNativeCommand.MappedCommandSender(ProxyServer.getInstance().getConsole());

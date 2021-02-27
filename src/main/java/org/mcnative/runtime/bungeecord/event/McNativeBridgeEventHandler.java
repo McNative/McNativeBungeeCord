@@ -29,9 +29,9 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.*;
 import net.pretronic.libraries.command.sender.CommandSender;
 import net.pretronic.libraries.event.EventBus;
-import net.pretronic.libraries.utility.SystemUtil;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.mcnative.runtime.api.event.player.login.MinecraftPlayerLoginConfirmEvent;
+import org.mcnative.runtime.api.proxy.ServerConnectHandler;
 import org.mcnative.runtime.bungeecord.event.player.*;
 import org.mcnative.runtime.bungeecord.event.server.BungeeServerConnectEvent;
 import org.mcnative.runtime.bungeecord.event.server.BungeeServerConnectedEvent;
@@ -62,7 +62,6 @@ import org.mcnative.runtime.api.player.PlayerClientSettings;
 import org.mcnative.runtime.api.player.data.MinecraftPlayerData;
 import org.mcnative.runtime.api.player.data.PlayerDataProvider;
 import org.mcnative.runtime.api.proxy.ProxyService;
-import org.mcnative.runtime.api.proxy.ServerConnectHandler;
 import org.mcnative.runtime.api.proxy.event.player.MinecraftPlayerServerConnectEvent;
 import org.mcnative.runtime.api.proxy.event.player.MinecraftPlayerServerConnectedEvent;
 import org.mcnative.runtime.api.proxy.event.player.MinecraftPlayerServerKickEvent;
@@ -259,7 +258,9 @@ public final class McNativeBridgeEventHandler {
     }
 
     private void handleServerKick(ServerKickEvent event){
-        ConnectedMinecraftPlayer player = playerManager.getMappedPlayer(event.getPlayer());
+        ConnectedMinecraftPlayer player = this.pendingPlayers.get(event.getPlayer().getUniqueId());
+        if(player == null) player = playerManager.getMappedPlayer(event.getPlayer());
+
         MinecraftPlayerServerKickEvent mcNativeEvent = new BungeeServerKickEvent(serverMap,event,player);
         ServerConnectHandler handler = McNative.getInstance().getRegistry().getServiceOrDefault(ServerConnectHandler.class);
         if(handler != null){
@@ -273,11 +274,11 @@ public final class McNativeBridgeEventHandler {
     }
 
     private void handleLogout(PlayerDisconnectEvent event){
-        OnlineMinecraftPlayer player = playerManager.getMappedPlayer(event.getPlayer());
+        ConnectedMinecraftPlayer player = this.pendingPlayers.get(event.getPlayer().getUniqueId());
+        if(player == null) player = playerManager.getMappedPlayer(event.getPlayer());
         if(player instanceof BungeeProxiedPlayer) ((BungeeProxiedPlayer) player).handleLogout();
         MinecraftPlayerLogoutEvent mcNativeEvent = new BungeeMinecraftLogoutEvent(player);
         eventBus.callEvents(PlayerDisconnectEvent.class,event,mcNativeEvent);
-        SystemUtil.sleepUninterruptible(700);//Sleep for security reasons
         playerManager.unregisterPlayer(event.getPlayer().getUniqueId());
     }
 
@@ -378,5 +379,6 @@ public final class McNativeBridgeEventHandler {
             return PlayerClientSettings.SkinParts.SKIN_SHOW_ALL;
         }
     }
+
 
 }
