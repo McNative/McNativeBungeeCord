@@ -28,7 +28,6 @@ import net.pretronic.libraries.command.command.configuration.CommandConfiguratio
 import net.pretronic.libraries.command.command.configuration.DefaultCommandConfiguration;
 import net.pretronic.libraries.document.DocumentRegistry;
 import net.pretronic.libraries.event.DefaultEventBus;
-import net.pretronic.libraries.event.network.EventOrigin;
 import net.pretronic.libraries.logging.bridge.JdkPretronicLogger;
 import net.pretronic.libraries.plugin.description.PluginVersion;
 import net.pretronic.libraries.utility.Iterators;
