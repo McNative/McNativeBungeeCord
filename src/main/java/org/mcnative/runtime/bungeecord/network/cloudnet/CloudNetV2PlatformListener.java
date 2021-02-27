@@ -51,7 +51,7 @@ public class CloudNetV2PlatformListener implements Listener {
         this.messenger.handleMessageEvent(event.getChannel(),event.getMessage(),event.getDocument());
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerPostLogin(LoginEvent event){
         //Fixes an issue where players are not logged out while login fails
         UUID uuid = event.getConnection().getUniqueId();
@@ -66,6 +66,6 @@ public class CloudNetV2PlatformListener implements Listener {
                 ProxyServer.getInstance().getScheduler().schedule(de.dytanic.cloudnet.bridge.CloudProxy.getInstance().getPlugin(),
                         () -> CloudProxy.getInstance().update(), 250L, TimeUnit.MILLISECONDS);
             }
-        }, 550L, TimeUnit.MILLISECONDS);
+        }, 750L, TimeUnit.MILLISECONDS);
     }
 }

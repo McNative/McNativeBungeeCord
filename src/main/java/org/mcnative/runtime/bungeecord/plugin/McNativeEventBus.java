@@ -26,6 +26,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 import net.md_5.bungee.event.EventHandler;
 import net.pretronic.libraries.event.EventBus;
+import net.pretronic.libraries.event.execution.ExecutionType;
 import net.pretronic.libraries.event.executor.MethodEventExecutor;
 import net.pretronic.libraries.utility.annonations.Internal;
 import net.pretronic.libraries.utility.interfaces.ObjectOwner;
@@ -72,7 +73,7 @@ public class McNativeEventBus extends net.md_5.bungee.event.EventBus {
                     Class<?> eventClass = method.getParameterTypes()[0];
                     Class<?> mappedClass = eventBus.getMappedClass(eventClass);
                     if(mappedClass == null) mappedClass = eventClass;
-                    eventBus.addExecutor(mappedClass,new MethodEventExecutor(ObjectOwner.SYSTEM,handler.priority(),listener,eventClass,method));
+                    eventBus.addExecutor(mappedClass,new MethodEventExecutor(ObjectOwner.SYSTEM,handler.priority(), ExecutionType.BLOCKING,listener,eventClass,method));
                 }
             }catch (Exception exception){
                 throw new IllegalArgumentException("Could not register listener "+listener,exception);
@@ -109,7 +110,7 @@ public class McNativeEventBus extends net.md_5.bungee.event.EventBus {
                             Plugin plugin = findOwner(listener);
                             eventBus.addExecutor(eventClass,new MethodEventExecutor(plugin!=null?
                                     new PluginObjectOwner(plugin):ObjectOwner.SYSTEM
-                                    ,priority,listener,eventClass,method));
+                                    ,priority,ExecutionType.BLOCKING,listener,eventClass,method));
                         }
                     }
                 }
