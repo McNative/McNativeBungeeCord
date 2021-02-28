@@ -101,7 +101,14 @@ public class BungeeCordServerMap implements TMap<String, ServerInfo> {
 
     public MinecraftServer getMappedServer(ServerInfo info){
         Validate.notNull(info);
+        System.out.println("GETTING MAPPED SERVER "+info.getName());
         if(info instanceof MinecraftServer) return (MinecraftServer) info;
+
+        System.out.println("AVAILABLE SERVERS ");
+        for (ServerEntry server : this.servers) {
+            System.out.println(server.getKey()+" | "+server.bungeeCord.getName()+" | "+server.mcNative.getName());
+        }
+        System.out.println("-------------------------------");
 
         ServerEntry result = Iterators.findOne(this.servers, entry -> entry.bungeeCord.getName().equalsIgnoreCase(info.getName()));
         if(result == null) throw new IllegalArgumentException("McNative mapping error (BungeeCord -> McNative)");
