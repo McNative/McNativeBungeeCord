@@ -224,7 +224,9 @@ public class McNativeLauncher {
         try{
             Object config = ProxyServer.getInstance().getConfig();
             ReflectionUtil.changeFieldValue(config,"servers",serverMap);
-        }catch (ReflectException ignored){}
+        }catch (ReflectException exception){
+            exception.printStackTrace();
+        }
     }
 
     protected static void shutdown(){

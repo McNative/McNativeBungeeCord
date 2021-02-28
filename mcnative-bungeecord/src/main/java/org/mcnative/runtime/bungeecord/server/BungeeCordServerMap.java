@@ -23,6 +23,7 @@ import gnu.trove.function.TObjectFunction;
 import gnu.trove.map.TMap;
 import gnu.trove.procedure.TObjectObjectProcedure;
 import gnu.trove.procedure.TObjectProcedure;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.Validate;
@@ -107,6 +108,12 @@ public class BungeeCordServerMap implements TMap<String, ServerInfo> {
         System.out.println("AVAILABLE SERVERS ");
         for (ServerEntry server : this.servers) {
             System.out.println(server.getKey()+" | "+server.bungeeCord.getName()+" | "+server.mcNative.getName());
+        }
+        System.out.println("-------------------------------");
+
+        System.out.println("System SERVERS ");
+        for (Entry<String, ServerInfo> server : ProxyServer.getInstance().getServers().entrySet()) {
+            System.out.println(server.getKey()+" | "+server.getValue().getName());
         }
         System.out.println("-------------------------------");
 
