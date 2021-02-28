@@ -52,6 +52,7 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
 
     @Override
     public void load() {
+        System.out.println("CONFIG LOAD ");
         this.original.load();
         this.serverMap.clear();
         this.serverMap.putAll(original.getServers());

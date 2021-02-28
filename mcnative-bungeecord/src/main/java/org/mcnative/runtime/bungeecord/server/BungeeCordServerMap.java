@@ -125,6 +125,7 @@ public class BungeeCordServerMap implements TMap<String, ServerInfo> {
 
     @Override
     public ServerInfo put(String unused, ServerInfo value) {
+        System.out.println("Register Server "+unused+" | "+value.getName());
         if(unused != null && !unused.equalsIgnoreCase(value.getName())) throw new IllegalArgumentException("Key does not match with the server name");
         MinecraftServer server = value instanceof MinecraftServer ? (MinecraftServer) value : new WrappedBungeeMinecraftServer(value);
         Iterators.removeOne(this.servers, entry -> entry.getKey().equalsIgnoreCase(value.getName()));
