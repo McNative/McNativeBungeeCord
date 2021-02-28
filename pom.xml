@@ -25,8 +25,9 @@
 
     <groupId>org.mcnative.runtime.bungeecord</groupId>
     <artifactId>McNativeBungeeCord</artifactId>
+    <version>1.11.0.75-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <version>1.10.33.72-SNAPSHOT</version>
+
     <modules>
         <module>mcnative-bungeecord-waterfall-patch</module>
         <module>mcnative-bungeecord</module>
@@ -137,10 +138,84 @@
             <id>releases</id>
             <url>https://repo.cloudnetservice.eu/repository/releases/</url>
         </repository>
-        <repository>
-            <id>papermc</id>
-            <url>https://papermc.io/repo/repository/maven-public/</url>
-        </repository>
     </repositories>
+
+    <dependencies>
+        <!-- Internal project dependencies -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-kqueue</artifactId>
+            <version>${dependency.netty}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mcnative.runtime.api</groupId>
+            <artifactId>mcnative-runtime-api-proxy</artifactId>
+            <version>${dependency.mcnative.api}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mcnative.runtime</groupId>
+            <artifactId>mcnative-runtime-common</artifactId>
+            <version>${dependency.mcnative.common}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mcnative.runtime</groupId>
+            <artifactId>mcnative-runtime-protocol-java</artifactId>
+            <version>${dependency.mcnative.common}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mcnative.runtime</groupId>
+            <artifactId>mcnative-runtime-network-integrations</artifactId>
+            <version>${dependency.mcnative.common}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Runtime Platform dependencies -->
+
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-api</artifactId>
+            <version>${dependency.bungeecord}</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-protocol</artifactId>
+            <version>${dependency.bungeecord}</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>de.dytanic.cloudnet</groupId>
+            <artifactId>cloudnet-api-bridge</artifactId>
+            <version>${dependency.cloudnet.v2}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>de.dytanic.cloudnet</groupId>
+            <artifactId>cloudnet-wrapper-jvm</artifactId>
+            <version>${dependency.cloudnet.v3}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>de.dytanic.cloudnet</groupId>
+            <artifactId>cloudnet-bridge</artifactId>
+            <version>${dependency.cloudnet.v3}</version>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
 
 </project>
