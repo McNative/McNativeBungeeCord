@@ -224,8 +224,8 @@ public class McNativeLauncher {
     private static void tryInjectServersToNewConfiguration(BungeeCordServerMap serverMap){
         try{
             Object config = ProxyServer.getInstance().getConfig();
-            ReflectionUtil.changeFieldValue(Configuration.class,config,"servers",serverMap);
-        }catch (ReflectException exception){
+            ReflectionUtil.changeFieldValue(Class.forName("net.md_5.bungee.conf.Configuration"),config,"servers",serverMap);
+        }catch (ReflectException | ClassNotFoundException exception){
             exception.printStackTrace();
         }
     }
