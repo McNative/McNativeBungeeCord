@@ -146,7 +146,7 @@ public class McNativeLauncher {
 
 
         McNativeBridgedEventBus eventBus;
-        if(ProxyServer.getInstance().getVersion().toLowerCase().contains("waterfall")){
+        if(isWaterfallBase()){
             eventBus = new McNativeWaterfallEventBus(localService.getEventBus());
         }else{
             eventBus = new McNativeBungeeEventBus(localService.getEventBus());
@@ -168,6 +168,11 @@ public class McNativeLauncher {
         }
 
         logger.info(McNative.CONSOLE_PREFIX+"McNative successfully started.");
+    }
+
+    private static boolean isWaterfallBase(){
+        return ProxyServer.getInstance().getVersion().toLowerCase().contains("waterfall")
+                || ProxyServer.getInstance().getVersion().toLowerCase().contains("travertine");
     }
 
     private static McNativeConsoleCredentials setupCredentials(Collection<Env> variables){
