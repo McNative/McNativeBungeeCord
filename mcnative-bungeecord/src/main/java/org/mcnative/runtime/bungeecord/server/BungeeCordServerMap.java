@@ -102,26 +102,10 @@ public class BungeeCordServerMap implements TMap<String, ServerInfo> {
 
     public MinecraftServer getMappedServer(ServerInfo info){
         Validate.notNull(info);
-        System.out.println("GETTING MAPPED SERVER "+info.getName());
         if(info instanceof MinecraftServer) return (MinecraftServer) info;
-
-        System.out.println(ProxyServer.getInstance().getServers().getClass());
-
-        System.out.println("AVAILABLE SERVERS ");
-        for (ServerEntry server : this.servers) {
-            System.out.println(server.getKey()+" | "+server.bungeeCord.getName()+" | "+server.mcNative.getName());
-        }
-        System.out.println("-------------------------------");
-
-        System.out.println("System SERVERS ");
-        for (Entry<String, ServerInfo> server : ProxyServer.getInstance().getServers().entrySet()) {
-            System.out.println(server.getKey()+" | "+server.getValue().getName());
-        }
-        System.out.println("-------------------------------");
-
         ServerEntry result = Iterators.findOne(this.servers, entry -> entry.bungeeCord.getName().equalsIgnoreCase(info.getName()));
         if(result == null) throw new IllegalArgumentException("McNative mapping error (BungeeCord -> McNative)");
-         return result.mcNative;
+        return result.mcNative;
     }
 
     public ServerInfo getMappedInfo(MinecraftServer server){
@@ -134,7 +118,6 @@ public class BungeeCordServerMap implements TMap<String, ServerInfo> {
 
     @Override
     public ServerInfo put(String unused, ServerInfo value) {
-        System.out.println("REGISTER SERVER "+value.getName());
         if(unused != null && !unused.equalsIgnoreCase(value.getName())) throw new IllegalArgumentException("Key does not match with the server name");
         MinecraftServer server = value instanceof MinecraftServer ? (MinecraftServer) value : new WrappedBungeeMinecraftServer(value);
         Iterators.removeOne(this.servers, entry -> entry.getKey().equalsIgnoreCase(value.getName()));
