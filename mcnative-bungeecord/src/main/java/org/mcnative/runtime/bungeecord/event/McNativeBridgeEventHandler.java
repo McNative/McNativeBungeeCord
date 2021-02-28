@@ -41,7 +41,6 @@ import org.mcnative.runtime.bungeecord.player.BungeeCordPlayerManager;
 import org.mcnative.runtime.bungeecord.player.BungeePendingConnection;
 import org.mcnative.runtime.bungeecord.player.BungeeProxiedPlayer;
 import org.mcnative.runtime.bungeecord.player.permission.BungeeCordPermissionHandler;
-import org.mcnative.runtime.bungeecord.plugin.McNativeEventBus;
 import org.mcnative.runtime.bungeecord.plugin.command.McNativeCommand;
 import org.mcnative.runtime.bungeecord.server.BungeeCordServerMap;
 import org.mcnative.runtime.api.McNative;
@@ -68,6 +67,7 @@ import org.mcnative.runtime.api.proxy.event.player.MinecraftPlayerServerKickEven
 import org.mcnative.runtime.api.serviceprovider.permission.Permissable;
 import org.mcnative.runtime.api.serviceprovider.permission.PermissionHandler;
 import org.mcnative.runtime.api.text.components.MessageComponent;
+import org.mcnative.runtime.bungeecord.shared.McNativeBridgedEventBus;
 import org.mcnative.runtime.common.event.player.DefaultMinecraftPlayerLoginConfirmEvent;
 import org.mcnative.runtime.common.event.service.local.DefaultLocalServiceReloadEvent;
 
@@ -80,14 +80,14 @@ public final class McNativeBridgeEventHandler {
 
     public static Favicon DEFAULT_FAVICON;
 
-    private final McNativeEventBus pluginManager;
+    private final McNativeBridgedEventBus pluginManager;
     private final BungeeCordPlayerManager playerManager;
     private final BungeeCordServerMap serverMap;
     private final EventBus eventBus;
     private final Map<UUID, BungeeProxiedPlayer> pendingPlayers;
     private final Map<Connection,String> tabCompleteCursors;
 
-    public McNativeBridgeEventHandler(McNativeEventBus pluginManager, EventBus eventBus, BungeeCordPlayerManager playerManager,BungeeCordServerMap serverMap) {
+    public McNativeBridgeEventHandler(McNativeBridgedEventBus pluginManager, EventBus eventBus, BungeeCordPlayerManager playerManager, BungeeCordServerMap serverMap) {
         this.pluginManager = pluginManager;
         this.eventBus = eventBus;
         this.playerManager = playerManager;
@@ -173,6 +173,7 @@ public final class McNativeBridgeEventHandler {
         MinecraftPlayerPendingLoginEvent pendingEvent = new BungeeMinecraftPendingLoginEvent(connection);
         eventBus.callEvent(MinecraftPlayerPendingLoginEvent.class,pendingEvent);
         if(pendingEvent.isCancelled()){
+            event.setCancelled(true);
             connection.disconnect(pendingEvent.getCancelReason(),pendingEvent.getCancelReasonVariables());
             return;
         }

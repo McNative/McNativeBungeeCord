@@ -24,6 +24,7 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginDescription;
 import net.md_5.bungee.api.plugin.PluginManager;
+import net.md_5.bungee.config.Configuration;
 import net.pretronic.libraries.command.command.configuration.CommandConfiguration;
 import net.pretronic.libraries.command.command.configuration.DefaultCommandConfiguration;
 import net.pretronic.libraries.document.DocumentRegistry;
@@ -45,7 +46,7 @@ import org.mcnative.runtime.bungeecord.network.cloudnet.CloudNetV2PlatformListen
 import org.mcnative.runtime.bungeecord.network.cloudnet.CloudNetV3PlatformListener;
 import org.mcnative.runtime.bungeecord.player.BungeeCordPlayerManager;
 import org.mcnative.runtime.bungeecord.plugin.BungeeCordPluginManager;
-import org.mcnative.runtime.bungeecord.plugin.McNativeEventBus;
+import org.mcnative.runtime.bungeecord.plugin.McNativeBungeeEventBus;
 import org.mcnative.runtime.bungeecord.plugin.command.BungeeCordCommandManager;
 import org.mcnative.runtime.bungeecord.server.BungeeCordServerMap;
 import org.mcnative.runtime.api.McNative;
@@ -55,6 +56,8 @@ import org.mcnative.runtime.api.network.component.server.ServerStatusResponse;
 import org.mcnative.runtime.api.player.chat.ChatChannel;
 import org.mcnative.runtime.api.player.chat.GroupChatFormatter;
 import org.mcnative.runtime.api.proxy.ProxyService;
+import org.mcnative.runtime.bungeecord.shared.McNativeBridgedEventBus;
+import org.mcnative.runtime.bungeecord.waterfall.McNativeWaterfallEventBus;
 import org.mcnative.runtime.common.event.service.local.DefaultLocalServiceShutdownEvent;
 import org.mcnative.runtime.common.maf.MAFService;
 import org.mcnative.runtime.common.network.event.NetworkEventHandler;
@@ -142,7 +145,13 @@ public class McNativeLauncher {
         proxy.setConfigurationAdapter(new McNativeConfigurationAdapter(serverMap,proxy.getConfigurationAdapter()));
         logger.info(McNative.CONSOLE_PREFIX+"McNative has overwritten the configuration adapter.");
 
-        McNativeEventBus eventBus = new McNativeEventBus(localService.getEventBus());
+
+        McNativeBridgedEventBus eventBus;
+        if(isWaterfallBase()){
+            eventBus = new McNativeWaterfallEventBus(localService.getEventBus());
+        }else{
+            eventBus = new McNativeBungeeEventBus(localService.getEventBus());
+        }
         logger.info(McNative.CONSOLE_PREFIX+"McNative initialised and injected event bus.");
 
         new McNativeBridgeEventHandler(eventBus,localService.getEventBus(),playerManager,serverMap);
@@ -160,6 +169,11 @@ public class McNativeLauncher {
         }
 
         logger.info(McNative.CONSOLE_PREFIX+"McNative successfully started.");
+    }
+
+    private static boolean isWaterfallBase(){
+        return ProxyServer.getInstance().getVersion().toLowerCase().contains("waterfall")
+                || ProxyServer.getInstance().getVersion().toLowerCase().contains("travertine");
     }
 
     private static McNativeConsoleCredentials setupCredentials(Collection<Env> variables){
@@ -207,11 +221,13 @@ public class McNativeLauncher {
         }
     }
 
-    private static void tryInjectServersToNewConfiguration(BungeeCordServerMap serverMap){
+    public static void tryInjectServersToNewConfiguration(BungeeCordServerMap serverMap){
         try{
             Object config = ProxyServer.getInstance().getConfig();
-            ReflectionUtil.changeFieldValue(config,"servers",serverMap);
-        }catch (ReflectException ignored){}
+            ReflectionUtil.changeFieldValue(Class.forName("net.md_5.bungee.conf.Configuration"),config,"servers",serverMap);
+        }catch (ReflectException | ClassNotFoundException exception){
+            exception.printStackTrace();
+        }
     }
 
     protected static void shutdown(){

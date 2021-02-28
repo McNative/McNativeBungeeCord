@@ -25,7 +25,14 @@
 
     <groupId>org.mcnative.runtime.bungeecord</groupId>
     <artifactId>McNativeBungeeCord</artifactId>
-    <version>1.10.35.77</version>
+    <version>1.11.9.89-BETA</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>mcnative-bungeecord-waterfall-patch</module>
+        <module>mcnative-bungeecord</module>
+        <module>mcnative-bungeecord-shared</module>
+    </modules>
 
     <distributionManagement>
         <repository>
@@ -44,8 +51,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Dependency version -->
-        <dependency.mcnative.api>1.0.36.45</dependency.mcnative.api>
-        <dependency.mcnative.common>1.8.21.53</dependency.mcnative.common>
+        <dependency.mcnative.api>1.0.35.44-SNAPSHOT</dependency.mcnative.api>
+        <dependency.mcnative.common>1.8.19.51-SNAPSHOT</dependency.mcnative.common>
         <dependency.netty>4.1.56.Final</dependency.netty>
 
         <dependency.bungeecord>1.16-R0.4-SNAPSHOT</dependency.bungeecord>
@@ -130,6 +137,10 @@
         <repository>
             <id>releases</id>
             <url>https://repo.cloudnetservice.eu/repository/releases/</url>
+        </repository>
+        <repository>
+            <id>papermc</id>
+            <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
     </repositories>
 
