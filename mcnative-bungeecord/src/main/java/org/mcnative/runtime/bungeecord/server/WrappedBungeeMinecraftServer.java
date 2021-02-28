@@ -155,7 +155,11 @@ public class WrappedBungeeMinecraftServer implements MinecraftServer, VariableOb
 
     @Override
     public InetSocketAddress getAddress() {
-        return (InetSocketAddress) original.getSocketAddress();
+        try{
+            return (InetSocketAddress) original.getSocketAddress();
+        }catch (NoSuchMethodError ignored) {
+            return original.getAddress();
+        }
     }
 
     @Override

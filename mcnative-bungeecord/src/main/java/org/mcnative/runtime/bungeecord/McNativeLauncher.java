@@ -45,7 +45,7 @@ import org.mcnative.runtime.bungeecord.network.cloudnet.CloudNetV2PlatformListen
 import org.mcnative.runtime.bungeecord.network.cloudnet.CloudNetV3PlatformListener;
 import org.mcnative.runtime.bungeecord.player.BungeeCordPlayerManager;
 import org.mcnative.runtime.bungeecord.plugin.BungeeCordPluginManager;
-import org.mcnative.runtime.bungeecord.plugin.McNativeEventBus;
+import org.mcnative.runtime.bungeecord.plugin.McNativeBungeeEventBus;
 import org.mcnative.runtime.bungeecord.plugin.command.BungeeCordCommandManager;
 import org.mcnative.runtime.bungeecord.server.BungeeCordServerMap;
 import org.mcnative.runtime.api.McNative;
@@ -55,6 +55,8 @@ import org.mcnative.runtime.api.network.component.server.ServerStatusResponse;
 import org.mcnative.runtime.api.player.chat.ChatChannel;
 import org.mcnative.runtime.api.player.chat.GroupChatFormatter;
 import org.mcnative.runtime.api.proxy.ProxyService;
+import org.mcnative.runtime.bungeecord.shared.McNativeBridgedEventBus;
+import org.mcnative.runtime.bungeecord.waterfall.McNativeWaterfallEventBus;
 import org.mcnative.runtime.common.event.service.local.DefaultLocalServiceShutdownEvent;
 import org.mcnative.runtime.common.maf.MAFService;
 import org.mcnative.runtime.common.network.event.NetworkEventHandler;
@@ -142,7 +144,13 @@ public class McNativeLauncher {
         proxy.setConfigurationAdapter(new McNativeConfigurationAdapter(serverMap,proxy.getConfigurationAdapter()));
         logger.info(McNative.CONSOLE_PREFIX+"McNative has overwritten the configuration adapter.");
 
-        McNativeEventBus eventBus = new McNativeEventBus(localService.getEventBus());
+
+        McNativeBridgedEventBus eventBus;
+        if(ProxyServer.getInstance().getVersion().toLowerCase().contains("waterfall")){
+            eventBus = new McNativeWaterfallEventBus(localService.getEventBus());
+        }else{
+            eventBus = new McNativeBungeeEventBus(localService.getEventBus());
+        }
         logger.info(McNative.CONSOLE_PREFIX+"McNative initialised and injected event bus.");
 
         new McNativeBridgeEventHandler(eventBus,localService.getEventBus(),playerManager,serverMap);

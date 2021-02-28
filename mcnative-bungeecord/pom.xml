@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>McNativeBungeeCord</artifactId>
+        <groupId>org.mcnative.runtime.bungeecord</groupId>
+        <version>1.10.33.72-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>mcnative-bungeecord</artifactId>
+
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <!-- Internal project dependencies -->
+
+        <dependency>
+            <groupId>org.mcnative.runtime.bungeecord</groupId>
+            <artifactId>mcnative-bungeecord-shared</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mcnative.runtime.bungeecord</groupId>
+            <artifactId>mcnative-bungeecord-waterfall-patch</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mcnative.runtime.api</groupId>
+            <artifactId>mcnative-runtime-api-proxy</artifactId>
+            <version>${dependency.mcnative.api}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mcnative.runtime</groupId>
+            <artifactId>mcnative-runtime-common</artifactId>
+            <version>${dependency.mcnative.common}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mcnative.runtime</groupId>
+            <artifactId>mcnative-runtime-protocol-java</artifactId>
+            <version>${dependency.mcnative.common}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mcnative.runtime</groupId>
+            <artifactId>mcnative-runtime-network-integrations</artifactId>
+            <version>${dependency.mcnative.common}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Runtime Platform dependencies -->
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-kqueue</artifactId>
+            <version>${dependency.netty}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-api</artifactId>
+            <version>${dependency.bungeecord}</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.md-5</groupId>
+            <artifactId>bungeecord-protocol</artifactId>
+            <version>${dependency.bungeecord}</version>
+            <type>jar</type>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>de.dytanic.cloudnet</groupId>
+            <artifactId>cloudnet-api-bridge</artifactId>
+            <version>${dependency.cloudnet.v2}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>de.dytanic.cloudnet</groupId>
+            <artifactId>cloudnet-wrapper-jvm</artifactId>
+            <version>${dependency.cloudnet.v3}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>de.dytanic.cloudnet</groupId>
+            <artifactId>cloudnet-bridge</artifactId>
+            <version>${dependency.cloudnet.v3}</version>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
+
+</project>
