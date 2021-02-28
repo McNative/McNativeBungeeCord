@@ -105,6 +105,8 @@ public class BungeeCordServerMap implements TMap<String, ServerInfo> {
         System.out.println("GETTING MAPPED SERVER "+info.getName());
         if(info instanceof MinecraftServer) return (MinecraftServer) info;
 
+        System.out.println(ProxyServer.getInstance().getServers().getClass());
+
         System.out.println("AVAILABLE SERVERS ");
         for (ServerEntry server : this.servers) {
             System.out.println(server.getKey()+" | "+server.bungeeCord.getName()+" | "+server.mcNative.getName());
