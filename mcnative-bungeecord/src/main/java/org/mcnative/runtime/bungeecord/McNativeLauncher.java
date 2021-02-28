@@ -24,6 +24,7 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginDescription;
 import net.md_5.bungee.api.plugin.PluginManager;
+import net.md_5.bungee.config.Configuration;
 import net.pretronic.libraries.command.command.configuration.CommandConfiguration;
 import net.pretronic.libraries.command.command.configuration.DefaultCommandConfiguration;
 import net.pretronic.libraries.document.DocumentRegistry;
@@ -223,7 +224,7 @@ public class McNativeLauncher {
     private static void tryInjectServersToNewConfiguration(BungeeCordServerMap serverMap){
         try{
             Object config = ProxyServer.getInstance().getConfig();
-            ReflectionUtil.changeFieldValue(config,"servers",serverMap);
+            ReflectionUtil.changeFieldValue(Configuration.class,config,"servers",serverMap);
         }catch (ReflectException exception){
             exception.printStackTrace();
         }
