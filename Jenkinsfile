@@ -19,7 +19,7 @@ String JAVADOCS_NAME = "mcnative"
 String JAVADOCS_MODULES = ":McNative,:mcnative-common,:mcnative-service,:mcnative-proxy,:mcnative-licensing"
 
 def MIRROR_SERVER_PUBLISHING = [
-        "target/McNativeBungeeCord-%version%.jar": "default",
+        "mcnative-bungeecord/target/mcnative-bungeecord-%version%.jar": "default",
 ]
 
 String MAVEN_SETTINGS_FILE_ID = "afe25550-309e-40c1-80ad-59da7989fb4e"

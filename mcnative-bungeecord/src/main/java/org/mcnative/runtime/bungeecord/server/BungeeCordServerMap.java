@@ -23,6 +23,7 @@ import gnu.trove.function.TObjectFunction;
 import gnu.trove.map.TMap;
 import gnu.trove.procedure.TObjectObjectProcedure;
 import gnu.trove.procedure.TObjectProcedure;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.Validate;
@@ -102,10 +103,9 @@ public class BungeeCordServerMap implements TMap<String, ServerInfo> {
     public MinecraftServer getMappedServer(ServerInfo info){
         Validate.notNull(info);
         if(info instanceof MinecraftServer) return (MinecraftServer) info;
-
         ServerEntry result = Iterators.findOne(this.servers, entry -> entry.bungeeCord.getName().equalsIgnoreCase(info.getName()));
         if(result == null) throw new IllegalArgumentException("McNative mapping error (BungeeCord -> McNative)");
-         return result.mcNative;
+        return result.mcNative;
     }
 
     public ServerInfo getMappedInfo(MinecraftServer server){

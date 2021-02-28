@@ -28,7 +28,7 @@ eclipse.
 nbproject/
 nbactions.xml
 .idea
-src/main/test
+mcnative-bungeecord/src/main/test
 build.xml
 bin/
 dist/

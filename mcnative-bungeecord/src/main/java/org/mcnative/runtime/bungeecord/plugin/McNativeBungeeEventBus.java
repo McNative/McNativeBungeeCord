@@ -31,13 +31,17 @@ import net.pretronic.libraries.event.executor.MethodEventExecutor;
 import net.pretronic.libraries.utility.annonations.Internal;
 import net.pretronic.libraries.utility.interfaces.ObjectOwner;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
+import org.mcnative.runtime.api.McNative;
+import org.mcnative.runtime.bungeecord.shared.McNativeBridgedEventBus;
+import org.mcnative.runtime.bungeecord.shared.PluginObjectOwner;
 
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-public class McNativeEventBus extends net.md_5.bungee.event.EventBus {
+public class McNativeBungeeEventBus extends net.md_5.bungee.event.EventBus implements McNativeBridgedEventBus {
 
     private final PluginManager original;
     private final EventBus eventBus;
@@ -45,7 +49,7 @@ public class McNativeEventBus extends net.md_5.bungee.event.EventBus {
 
     private Multimap<Plugin, Listener> listenersByPlugin;
 
-    public McNativeEventBus(EventBus eventBus) {
+    public McNativeBungeeEventBus(EventBus eventBus) {
         super(ProxyServer.getInstance().getLogger());
         this.eventBus = eventBus;
         this.original = ProxyServer.getInstance().getPluginManager();
@@ -116,6 +120,9 @@ public class McNativeEventBus extends net.md_5.bungee.event.EventBus {
                 }
             }
         }
+        McNative.getInstance().getScheduler().createTask(ObjectOwner.SYSTEM).delay(5, TimeUnit.SECONDS).execute(() -> {
+            Object bus = ReflectionUtil.getFieldValue(original,"eventBus");
+        });
     }
 
     @Internal

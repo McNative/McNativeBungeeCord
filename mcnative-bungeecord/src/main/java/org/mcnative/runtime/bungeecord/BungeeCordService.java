@@ -191,7 +191,11 @@ public class BungeeCordService implements LocalService, ProxyServer, ProxyServic
     @Override
     public InetSocketAddress getAddress() {
         for (ListenerInfo listener : net.md_5.bungee.api.ProxyServer.getInstance().getConfigurationAdapter().getListeners()){
-            return (InetSocketAddress) listener.getSocketAddress();
+            try {
+                return (InetSocketAddress) listener.getSocketAddress();
+            }catch (NoSuchMethodError ignored){
+                return listener.getHost();
+            }
         }
         return null;
     }

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.mcnative.runtime.bungeecord.plugin;
+package org.mcnative.runtime.bungeecord.shared;
 
 import net.md_5.bungee.api.plugin.Plugin;
 import net.pretronic.libraries.utility.interfaces.ObjectOwner;

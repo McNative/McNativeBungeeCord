@@ -19,9 +19,11 @@
 
 package org.mcnative.runtime.bungeecord;
 
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ConfigurationAdapter;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.pretronic.libraries.utility.interfaces.ObjectOwner;
 import org.mcnative.runtime.bungeecord.server.BungeeCordServerMap;
 import org.mcnative.runtime.api.McNative;
 import org.mcnative.runtime.api.event.service.local.LocalServiceStartupEvent;
@@ -31,6 +33,7 @@ import org.mcnative.runtime.common.event.service.local.DefaultLocalServiceStartu
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class McNativeConfigurationAdapter implements ConfigurationAdapter {
 
@@ -66,6 +69,14 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
         //Config loaded and service is ready
         McNative.getInstance().getLocal().getEventBus().callEvent(LocalServiceStartupEvent.class
                 ,new DefaultLocalServiceStartupEvent());
+
+        McNative.getInstance().getScheduler().createTask(ObjectOwner.SYSTEM).delay(500, TimeUnit.MILLISECONDS).execute(() -> {
+            if(!ProxyServer.getInstance().getServers().equals(serverMap)){
+                this.serverMap.clear();
+                this.serverMap.putAll(ProxyServer.getInstance().getServers());
+                McNativeLauncher.tryInjectServersToNewConfiguration(serverMap);
+            }
+        });
     }
 
     @Override
