@@ -27,8 +27,12 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.Validate;
+import net.pretronic.libraries.utility.reflect.ReflectException;
+import net.pretronic.libraries.utility.reflect.ReflectionUtil;
+import org.mcnative.runtime.api.McNative;
 import org.mcnative.runtime.api.network.component.server.MinecraftServer;
 import org.mcnative.runtime.api.network.component.server.MinecraftServerType;
+import org.mcnative.runtime.bungeecord.McNativeLauncher;
 
 import java.net.InetSocketAddress;
 import java.util.*;
@@ -81,6 +85,7 @@ public class BungeeCordServerMap implements TMap<String, ServerInfo> {
 
     public MinecraftServer getServer(String name){
         Validate.notNull(name);
+        tryCheckInject();
         ServerEntry result = Iterators.findOne(this.servers, entry -> entry.getKey().equalsIgnoreCase(name));
         if(result != null) return result.mcNative;
         else return null;
@@ -88,6 +93,7 @@ public class BungeeCordServerMap implements TMap<String, ServerInfo> {
 
     public MinecraftServer getServer(UUID uniqueId){
         Validate.notNull(uniqueId);
+        tryCheckInject();
         ServerEntry result = Iterators.findOne(this.servers, entry -> entry.mcNative.getIdentifier().getUniqueId().equals(uniqueId));
         if(result != null) return result.mcNative;
         else return null;
@@ -95,6 +101,7 @@ public class BungeeCordServerMap implements TMap<String, ServerInfo> {
 
     public MinecraftServer getServer(InetSocketAddress address){
         Validate.notNull(address);
+        tryCheckInject();
         ServerEntry result = Iterators.findOne(this.servers, entry -> entry.getValue().getAddress().equals(address));
         if(result != null) return result.mcNative;
         else return null;
@@ -102,6 +109,7 @@ public class BungeeCordServerMap implements TMap<String, ServerInfo> {
 
     public MinecraftServer getMappedServer(ServerInfo info){
         Validate.notNull(info);
+        tryCheckInject();
         if(info instanceof MinecraftServer) return (MinecraftServer) info;
         ServerEntry result = Iterators.findOne(this.servers, entry -> entry.bungeeCord.getName().equalsIgnoreCase(info.getName()));
         if(result == null) throw new IllegalArgumentException("McNative mapping error (BungeeCord -> McNative)");
@@ -110,6 +118,7 @@ public class BungeeCordServerMap implements TMap<String, ServerInfo> {
 
     public ServerInfo getMappedInfo(MinecraftServer server){
         Validate.notNull(server);
+        tryCheckInject();
         if(server instanceof ServerInfo) return (ServerInfo) server;
         ServerEntry result = Iterators.findOne(this.servers, entry -> entry.mcNative.equals(server));
         if(result == null) throw new IllegalArgumentException("The targeted server is not registered as a server (McNative -> BungeeCord).");
@@ -187,6 +196,26 @@ public class BungeeCordServerMap implements TMap<String, ServerInfo> {
     @Override
     public void transformValues(TObjectFunction<ServerInfo, ServerInfo> tObjectFunction) {
         throw new UnsupportedOperationException();
+    }
+
+    public void inject(){
+        try{
+            Object config = ProxyServer.getInstance().getConfig();
+            ReflectionUtil.changeFieldValue(Class.forName("net.md_5.bungee.conf.Configuration"),config,"servers",this);
+        }catch (ReflectException | ClassNotFoundException exception){
+            exception.printStackTrace();
+        }
+    }
+
+    public void tryCheckInject(){
+        if(!ProxyServer.getInstance().getServers().equals(this)){
+            synchronized (this){
+                McNative.getInstance().getLogger().info(McNative.CONSOLE_PREFIX+"Server map changed, injection McNative server map");
+                clear();
+                putAll(ProxyServer.getInstance().getServers());
+                inject();
+            }
+        }
     }
 
     private static class ServerEntry implements Entry<String, ServerInfo>{
