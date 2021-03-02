@@ -69,14 +69,6 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
         //Config loaded and service is ready
         McNative.getInstance().getLocal().getEventBus().callEvent(LocalServiceStartupEvent.class
                 ,new DefaultLocalServiceStartupEvent());
-
-        McNative.getInstance().getScheduler().createTask(ObjectOwner.SYSTEM).delay(500, TimeUnit.MILLISECONDS).execute(() -> {
-            if(!ProxyServer.getInstance().getServers().equals(serverMap)){
-                this.serverMap.clear();
-                this.serverMap.putAll(ProxyServer.getInstance().getServers());
-                McNativeLauncher.tryInjectServersToNewConfiguration(serverMap);
-            }
-        });
     }
 
     @Override
