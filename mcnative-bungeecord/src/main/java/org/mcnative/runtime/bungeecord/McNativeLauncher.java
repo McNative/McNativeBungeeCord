@@ -108,7 +108,7 @@ public class McNativeLauncher {
         if(!McNativeBungeeCordConfiguration.load(new JdkPretronicLogger(logger),new File("plugins/McNative/"))) return;
 
         BungeeCordServerMap serverMap = new BungeeCordServerMap();
-        tryInjectServersToNewConfiguration(serverMap);
+        serverMap.inject();
         logger.info(McNative.CONSOLE_PREFIX+"McNative initialised and injected server map.");
 
         BungeeCordPluginManager pluginManager = new BungeeCordPluginManager();
@@ -218,15 +218,6 @@ public class McNativeLauncher {
             try{
                 McNativeBridgeEventHandler.DEFAULT_FAVICON = Favicon.create(ImageIO.read(ServerStatusResponse.DEFAULT_FAVICON_URL));
             }catch (Exception ignored){}
-        }
-    }
-
-    public static void tryInjectServersToNewConfiguration(BungeeCordServerMap serverMap){
-        try{
-            Object config = ProxyServer.getInstance().getConfig();
-            ReflectionUtil.changeFieldValue(Class.forName("net.md_5.bungee.conf.Configuration"),config,"servers",serverMap);
-        }catch (ReflectException | ClassNotFoundException exception){
-            exception.printStackTrace();
         }
     }
 
