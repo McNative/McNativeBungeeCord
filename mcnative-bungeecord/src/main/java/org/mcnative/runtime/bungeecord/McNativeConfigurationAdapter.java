@@ -36,6 +36,7 @@ import java.util.Map;
 public class McNativeConfigurationAdapter implements ConfigurationAdapter {
 
     private final ConfigurationAdapter original;
+    private Collection<ListenerInfo> listeners;
 
     public McNativeConfigurationAdapter(ConfigurationAdapter original) {
         this.original = original;
@@ -44,6 +45,15 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
     @Override
     public void load() {
         this.original.load();
+
+        this.listeners = this.original.getListeners();
+        List<String> servers = Iterators.map(original.getServers().keySet(), s -> s.trim().toLowerCase());
+        for (ListenerInfo listener : listeners) {
+            if(listener.getServerPriority() != null){
+                listener.getServerPriority().clear();
+                Iterators.remove(listener.getServerPriority(), server -> !servers.contains(server.trim().toLowerCase()));
+            }
+        }
 
         McNativeBungeeCordConfiguration.SERVER_SERVERS.forEach((name, config) -> {
             MinecraftServer server = ProxyService.getInstance().registerServer(name,config.getAddress());
@@ -86,17 +96,7 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
 
     @Override
     public Collection<ListenerInfo> getListeners() {
-        System.out.println("GET LISTENERS");
-        //Clear wrong property configuration
-        List<String> servers = Iterators.map(original.getServers().keySet(), s -> s.trim().toLowerCase());
-        for (ListenerInfo listener : original.getListeners()) {
-            System.out.println(listener.getServerPriority() );
-            if(listener.getServerPriority() != null){
-                listener.getServerPriority().clear();
-                //Iterators.remove(listener.getServerPriority(), server -> !servers.contains(server.trim().toLowerCase()));
-            }
-        }
-        return original.getListeners();
+        return listeners;
     }
 
     @Override
