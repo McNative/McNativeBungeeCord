@@ -48,14 +48,6 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
     public void load() {
         this.original.load();
 
-        //Clear wrong property configuration
-        List<String> servers = Iterators.map(original.getServers().keySet(), s -> s.trim().toLowerCase());
-        for (ListenerInfo listener : original.getListeners()) {
-            if(listener.getServerPriority() != null){
-                Iterators.remove(listener.getServerPriority(), server -> !servers.contains(server.trim().toLowerCase()));
-            }
-        }
-
         McNativeBungeeCordConfiguration.SERVER_SERVERS.forEach((name, config) -> {
             MinecraftServer server = ProxyService.getInstance().registerServer(name,config.getAddress());
             if(config.getPermission() != null) server.setPermission(config.getPermission());
@@ -97,6 +89,13 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
 
     @Override
     public Collection<ListenerInfo> getListeners() {
+        //Clear wrong property configuration
+        List<String> servers = Iterators.map(original.getServers().keySet(), s -> s.trim().toLowerCase());
+        for (ListenerInfo listener : original.getListeners()) {
+            if(listener.getServerPriority() != null){
+                Iterators.remove(listener.getServerPriority(), server -> !servers.contains(server.trim().toLowerCase()));
+            }
+        }
         return original.getListeners();
     }
 
