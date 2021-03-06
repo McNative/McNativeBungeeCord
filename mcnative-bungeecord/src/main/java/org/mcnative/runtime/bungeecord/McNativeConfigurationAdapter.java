@@ -19,12 +19,10 @@
 
 package org.mcnative.runtime.bungeecord;
 
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ConfigurationAdapter;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
-import net.pretronic.libraries.utility.interfaces.ObjectOwner;
-import org.mcnative.runtime.bungeecord.server.BungeeCordServerMap;
+import net.pretronic.libraries.utility.Iterators;
 import org.mcnative.runtime.api.McNative;
 import org.mcnative.runtime.api.event.service.local.LocalServiceStartupEvent;
 import org.mcnative.runtime.api.network.component.server.MinecraftServer;
@@ -32,33 +30,30 @@ import org.mcnative.runtime.api.proxy.ProxyService;
 import org.mcnative.runtime.common.event.service.local.DefaultLocalServiceStartupEvent;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class McNativeConfigurationAdapter implements ConfigurationAdapter {
 
     private final ConfigurationAdapter original;
-    private final BungeeCordServerMap serverMap;
+    private Collection<ListenerInfo> listeners;
 
-    public McNativeConfigurationAdapter(BungeeCordServerMap serverMap, ConfigurationAdapter original) {
+    public McNativeConfigurationAdapter(ConfigurationAdapter original) {
         this.original = original;
-        this.serverMap = serverMap;
-
-        try{//If configuration is not loaded, a NUllPointException can occur
-            if(original != null && original.getServers() != null && !original.getServers().isEmpty()){
-                this.serverMap.clear();
-                this.serverMap.putAll(original.getServers());
-                this.original.getServers().clear();
-            }
-        }catch (NullPointerException ignored){}
     }
 
     @Override
     public void load() {
         this.original.load();
-        this.serverMap.clear();
-        this.serverMap.putAll(original.getServers());
-        this.original.getServers().clear();
+
+        this.listeners = this.original.getListeners();
+        List<String> servers = Iterators.map(original.getServers().keySet(), s -> s.trim().toLowerCase());
+        for (ListenerInfo listener : listeners) {
+            if(listener.getServerPriority() != null){
+                listener.getServerPriority().clear();
+                Iterators.remove(listener.getServerPriority(), server -> !servers.contains(server.trim().toLowerCase()));
+            }
+        }
 
         McNativeBungeeCordConfiguration.SERVER_SERVERS.forEach((name, config) -> {
             MinecraftServer server = ProxyService.getInstance().registerServer(name,config.getAddress());
@@ -70,6 +65,8 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
         McNative.getInstance().getLocal().getEventBus().callEvent(LocalServiceStartupEvent.class
                 ,new DefaultLocalServiceStartupEvent());
     }
+
+
 
     @Override
     public int getInt(String path, int def) {
@@ -94,12 +91,12 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
 
     @Override
     public Map<String, ServerInfo> getServers() {
-        return this.serverMap;
+        return original.getServers();
     }
 
     @Override
     public Collection<ListenerInfo> getListeners() {
-        return original.getListeners();
+        return listeners;
     }
 
     @Override

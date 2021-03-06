@@ -59,8 +59,7 @@ public class McNativeCommand extends Command implements TabExecutor {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        McNative.getInstance().getScheduler().createTask(ObjectOwner.SYSTEM)
-                .async().execute(() -> {
+        McNative.getInstance().getScheduler().createTask(ObjectOwner.SYSTEM).async().execute(() -> {
             net.pretronic.libraries.command.sender.CommandSender mappedSender = getMappedSender(sender);
 
             NoPermissionHandler noPermissionHandler;
