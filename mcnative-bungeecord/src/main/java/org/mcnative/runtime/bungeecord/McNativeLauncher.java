@@ -142,7 +142,7 @@ public class McNativeLauncher {
         instance.registerDefaultDescribers();
         instance.registerDefaultCreators();
 
-        proxy.setConfigurationAdapter(new McNativeConfigurationAdapter(serverMap,proxy.getConfigurationAdapter()));
+        proxy.setConfigurationAdapter(new McNativeConfigurationAdapter(proxy.getConfigurationAdapter()));
         logger.info(McNative.CONSOLE_PREFIX+"McNative has overwritten the configuration adapter.");
 
 
