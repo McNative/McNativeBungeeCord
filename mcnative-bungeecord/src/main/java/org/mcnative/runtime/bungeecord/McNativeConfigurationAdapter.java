@@ -19,11 +19,9 @@
 
 package org.mcnative.runtime.bungeecord;
 
-import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ConfigurationAdapter;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
-import net.pretronic.libraries.utility.interfaces.ObjectOwner;
 import org.mcnative.runtime.bungeecord.server.BungeeCordServerMap;
 import org.mcnative.runtime.api.McNative;
 import org.mcnative.runtime.api.event.service.local.LocalServiceStartupEvent;
@@ -33,31 +31,18 @@ import org.mcnative.runtime.common.event.service.local.DefaultLocalServiceStartu
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class McNativeConfigurationAdapter implements ConfigurationAdapter {
 
     private final ConfigurationAdapter original;
-    private final BungeeCordServerMap serverMap;
 
-    public McNativeConfigurationAdapter(BungeeCordServerMap serverMap, ConfigurationAdapter original) {
+    public McNativeConfigurationAdapter(ConfigurationAdapter original) {
         this.original = original;
-        this.serverMap = serverMap;
-
-        try{//If configuration is not loaded, a NUllPointException can occur
-            if(original != null && original.getServers() != null && !original.getServers().isEmpty()){
-                this.serverMap.clear();
-                this.serverMap.putAll(original.getServers());
-                this.original.getServers().clear();
-            }
-        }catch (NullPointerException ignored){}
     }
 
     @Override
     public void load() {
         this.original.load();
-        this.serverMap.clear();
-        this.serverMap.putAll(original.getServers());
         this.original.getServers().clear();
 
         McNativeBungeeCordConfiguration.SERVER_SERVERS.forEach((name, config) -> {
@@ -70,6 +55,8 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
         McNative.getInstance().getLocal().getEventBus().callEvent(LocalServiceStartupEvent.class
                 ,new DefaultLocalServiceStartupEvent());
     }
+
+
 
     @Override
     public int getInt(String path, int def) {
@@ -94,7 +81,7 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
 
     @Override
     public Map<String, ServerInfo> getServers() {
-        return this.serverMap;
+        return original.getServers();
     }
 
     @Override

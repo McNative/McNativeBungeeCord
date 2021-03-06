@@ -210,7 +210,7 @@ public class BungeeCordServerMap implements TMap<String, ServerInfo> {
     public void tryCheckInject(){
         if(!ProxyServer.getInstance().getServers().equals(this)){
             synchronized (this){
-                McNative.getInstance().getLogger().info(McNative.CONSOLE_PREFIX+"Server map changed, injection McNative server map");
+                McNative.getInstance().getLogger().info(McNative.CONSOLE_PREFIX+"Server map changed, injecting McNative server map");
                 clear();
                 putAll(ProxyServer.getInstance().getServers());
                 inject();
