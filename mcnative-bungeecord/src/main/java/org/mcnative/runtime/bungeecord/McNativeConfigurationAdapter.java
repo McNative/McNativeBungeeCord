@@ -33,8 +33,6 @@ import org.mcnative.runtime.common.event.service.local.DefaultLocalServiceStartu
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class McNativeConfigurationAdapter implements ConfigurationAdapter {
 
@@ -89,13 +87,6 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
 
     @Override
     public Collection<ListenerInfo> getListeners() {
-        //Clear wrong property configuration
-        List<String> servers = Iterators.map(original.getServers().keySet(), s -> s.trim().toLowerCase());
-        for (ListenerInfo listener : original.getListeners()) {
-            if(listener.getServerPriority() != null){
-                Iterators.remove(listener.getServerPriority(), server -> !servers.contains(server.trim().toLowerCase()));
-            }
-        }
         return original.getListeners();
     }
 
