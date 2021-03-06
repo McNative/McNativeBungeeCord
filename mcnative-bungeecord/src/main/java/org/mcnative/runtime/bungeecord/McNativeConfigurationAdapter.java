@@ -22,6 +22,7 @@ package org.mcnative.runtime.bungeecord;
 import net.md_5.bungee.api.config.ConfigurationAdapter;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.pretronic.libraries.utility.Iterators;
 import org.mcnative.runtime.bungeecord.server.BungeeCordServerMap;
 import org.mcnative.runtime.api.McNative;
 import org.mcnative.runtime.api.event.service.local.LocalServiceStartupEvent;
@@ -30,7 +31,10 @@ import org.mcnative.runtime.api.proxy.ProxyService;
 import org.mcnative.runtime.common.event.service.local.DefaultLocalServiceStartupEvent;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class McNativeConfigurationAdapter implements ConfigurationAdapter {
 
@@ -43,7 +47,14 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
     @Override
     public void load() {
         this.original.load();
-        this.original.getServers().clear();
+
+        //Clear wrong property configuration
+        List<String> servers = Iterators.map(original.getServers().keySet(), s -> s.trim().toLowerCase());
+        for (ListenerInfo listener : original.getListeners()) {
+            if(listener.getServerPriority() != null){
+                Iterators.remove(listener.getServerPriority(), server -> !servers.contains(server.trim().toLowerCase()));
+            }
+        }
 
         McNativeBungeeCordConfiguration.SERVER_SERVERS.forEach((name, config) -> {
             MinecraftServer server = ProxyService.getInstance().registerServer(name,config.getAddress());
