@@ -90,7 +90,8 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
         List<String> servers = Iterators.map(original.getServers().keySet(), s -> s.trim().toLowerCase());
         for (ListenerInfo listener : original.getListeners()) {
             if(listener.getServerPriority() != null){
-                Iterators.remove(listener.getServerPriority(), server -> !servers.contains(server.trim().toLowerCase()));
+                listener.getServerPriority().clear();
+                //Iterators.remove(listener.getServerPriority(), server -> !servers.contains(server.trim().toLowerCase()));
             }
         }
         return original.getListeners();
