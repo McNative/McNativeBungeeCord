@@ -100,5 +100,4 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
         return original.getPermissions(group);
     }
 
-
 }
