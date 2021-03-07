@@ -36,7 +36,6 @@ import java.util.Map;
 public class McNativeConfigurationAdapter implements ConfigurationAdapter {
 
     private final ConfigurationAdapter original;
-    private Collection<ListenerInfo> listeners;
 
     public McNativeConfigurationAdapter(ConfigurationAdapter original) {
         this.original = original;
@@ -46,16 +45,8 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
     public void load() {
         this.original.load();
 
-        this.listeners = this.original.getListeners();
-        List<String> servers = Iterators.map(original.getServers().keySet(), s -> s.trim().toLowerCase());
-        for (ListenerInfo listener : listeners) {
-            if(listener.getServerPriority() != null){
-                listener.getServerPriority().clear();
-                Iterators.remove(listener.getServerPriority(), server -> !servers.contains(server.trim().toLowerCase()));
-            }
-        }
-
         McNativeBungeeCordConfiguration.SERVER_SERVERS.forEach((name, config) -> {
+            McNative.getInstance().getLogger().info(McNative.CONSOLE_PREFIX+"registered server "+name+"["+config.getAddress()+"]");
             MinecraftServer server = ProxyService.getInstance().registerServer(name,config.getAddress());
             if(config.getPermission() != null) server.setPermission(config.getPermission());
             if(config.getType() != null) server.setType(config.getType());
@@ -96,7 +87,7 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
 
     @Override
     public Collection<ListenerInfo> getListeners() {
-        return listeners;
+        return original.getListeners();
     }
 
     @Override
@@ -108,4 +99,6 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
     public Collection<String> getPermissions(String group) {
         return original.getPermissions(group);
     }
+
+
 }
