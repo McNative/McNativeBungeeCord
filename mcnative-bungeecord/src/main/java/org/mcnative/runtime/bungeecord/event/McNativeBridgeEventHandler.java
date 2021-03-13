@@ -31,6 +31,7 @@ import net.pretronic.libraries.command.sender.CommandSender;
 import net.pretronic.libraries.event.EventBus;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.mcnative.runtime.api.event.player.login.MinecraftPlayerLoginConfirmEvent;
+import org.mcnative.runtime.api.player.tablist.Tablist;
 import org.mcnative.runtime.api.proxy.ServerConnectHandler;
 import org.mcnative.runtime.bungeecord.event.player.*;
 import org.mcnative.runtime.bungeecord.event.server.BungeeServerConnectEvent;
@@ -233,6 +234,13 @@ public final class McNativeBridgeEventHandler {
             MessageComponent<?> message = handler.getNoFallBackServerMessage(player);
             if(message != null) player.disconnect(message);
         }
+
+        //set global Tablist if available
+        Tablist serverTablist = McNative.getInstance().getLocal().getServerTablist();
+        if(serverTablist != null){
+            serverTablist.addEntry(player);
+            player.setTablist(serverTablist);
+        }
     }
 
     private void handleServerConnected(ServerConnectedEvent event){
@@ -281,6 +289,10 @@ public final class McNativeBridgeEventHandler {
         MinecraftPlayerLogoutEvent mcNativeEvent = new BungeeMinecraftLogoutEvent(player);
         eventBus.callEvents(PlayerDisconnectEvent.class,event,mcNativeEvent);
         playerManager.unregisterPlayer(event.getPlayer().getUniqueId());
+
+        player.setTablist(null);
+        Tablist serverTablist = McNative.getInstance().getLocal().getServerTablist();
+        if(serverTablist != null) serverTablist.removeEntry(player);
     }
 
     private void handleChatEvent(ChatEvent event) {

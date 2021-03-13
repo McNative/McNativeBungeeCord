@@ -29,6 +29,7 @@ import net.pretronic.libraries.utility.annonations.Internal;
 import net.pretronic.libraries.utility.interfaces.ObjectOwner;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.mcnative.runtime.api.connection.MinecraftOutputStream;
+import org.mcnative.runtime.api.player.tablist.TablistEntry;
 import org.mcnative.runtime.bungeecord.McNativeBungeeCordConfiguration;
 import org.mcnative.runtime.bungeecord.server.BungeeCordServerMap;
 import org.mcnative.runtime.bungeecord.server.WrappedBungeeMinecraftServer;
@@ -57,12 +58,15 @@ import org.mcnative.runtime.api.protocol.packet.type.MinecraftTitlePacket;
 import org.mcnative.runtime.api.text.Text;
 import org.mcnative.runtime.api.text.components.MessageComponent;
 import org.mcnative.runtime.common.player.OfflineMinecraftPlayer;
+import org.mcnative.runtime.common.player.tablist.AbstractTablist;
 import org.mcnative.runtime.protocol.java.netty.rewrite.MinecraftProtocolRewriteDecoder;
 import org.mcnative.runtime.protocol.java.netty.rewrite.MinecraftProtocolRewriteEncoder;
 
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -87,6 +91,10 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
 
     private ChatChannel chatChannel;
 
+    private Tablist tablist;
+    private final Map<TablistEntry,String> tablistTeamNames;
+    private int tablistTeamIndex;
+
     private boolean firstJoin;
 
     public BungeeProxiedPlayer(BungeeCordServerMap serverMap,BungeePendingConnection connection, MinecraftPlayerData playerData) {
@@ -94,6 +102,9 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
         this.serverMap = serverMap;
         this.connection = connection;
         this.firstJoin = true;
+
+        this.tablistTeamNames = new HashMap<>();
+        this.tablistTeamIndex = 0;
     }
 
     @Internal
@@ -247,12 +258,19 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
 
     @Override
     public Tablist getTablist() {
-        throw new UnsupportedOperationException("Coming soon");
+        return tablist;
     }
 
     @Override
     public void setTablist(Tablist tablist) {
-        throw new UnsupportedOperationException("Coming soon");
+        if(this.tablist != null){
+            ((AbstractTablist)this.tablist).detachReceiver(this);
+        }
+        this.tablistTeamNames.clear();
+        if(tablist != null){
+            this.tablist = tablist;
+            ((AbstractTablist)this.tablist).attachReceiver(this);
+        }
     }
 
     @Override
@@ -524,6 +542,16 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
     @Internal
     public void setFirstJoin(boolean firstJoin) {
         this.firstJoin = firstJoin;
+    }
+
+    @Internal
+    public Map<TablistEntry, String> getTablistTeamNames() {
+        return tablistTeamNames;
+    }
+
+    @Internal
+    public int getTablistTeamIndexAndIncrement(){
+        return tablistTeamIndex++;
     }
 }
 
