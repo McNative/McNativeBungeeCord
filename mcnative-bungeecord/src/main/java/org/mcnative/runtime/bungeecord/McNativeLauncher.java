@@ -145,7 +145,6 @@ public class McNativeLauncher {
         proxy.setConfigurationAdapter(new McNativeConfigurationAdapter(proxy.getConfigurationAdapter()));
         logger.info(McNative.CONSOLE_PREFIX+"McNative has overwritten the configuration adapter.");
 
-
         McNativeBridgedEventBus eventBus;
         if(isWaterfallBase()){
             eventBus = new McNativeWaterfallEventBus(localService.getEventBus());
