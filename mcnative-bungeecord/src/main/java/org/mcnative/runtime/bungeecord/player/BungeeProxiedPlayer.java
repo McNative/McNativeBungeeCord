@@ -45,9 +45,6 @@ import org.mcnative.runtime.api.player.chat.ChatPosition;
 import org.mcnative.runtime.api.player.data.MinecraftPlayerData;
 import org.mcnative.runtime.api.player.scoreboard.BelowNameInfo;
 import org.mcnative.runtime.api.player.scoreboard.sidebar.Sidebar;
-import org.mcnative.runtime.api.player.sound.Instrument;
-import org.mcnative.runtime.api.player.sound.Note;
-import org.mcnative.runtime.api.player.sound.Sound;
 import org.mcnative.runtime.api.player.sound.SoundCategory;
 import org.mcnative.runtime.api.player.tablist.Tablist;
 import org.mcnative.runtime.api.protocol.Endpoint;
@@ -360,20 +357,6 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
         throw new UnsupportedOperationException("Coming soon");
     }
 
-    @Override
-    public void playNote(Instrument instrument, Note note) {
-        throw new UnsupportedOperationException("Coming soon");
-    }
-
-    @Override
-    public void playSound(Sound sound, SoundCategory category, float volume, float pitch) {
-        throw new UnsupportedOperationException("Coming soon");
-    }
-
-    @Override
-    public void stopSound(Sound sound) {
-        throw new UnsupportedOperationException("Coming soon");
-    }
 
     @Override
     public void stopSound(String sound, SoundCategory category) {
@@ -416,6 +399,26 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
     @Override
     public void sendPacket(MinecraftPacket packet) {
         connection.sendPacket(packet);
+    }
+
+    @Override
+    public void playSound(String s, SoundCategory soundCategory, float v, float v1) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void stopSound() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void stopSound(String s) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void stopSound(SoundCategory soundCategory) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
