@@ -33,6 +33,7 @@ import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
+import net.pretronic.libraries.utility.interfaces.ObjectOwner;
 import org.mcnative.runtime.api.McNative;
 import org.mcnative.runtime.api.event.service.local.LocalServiceMaxPlayerCountEvent;
 import org.mcnative.runtime.bungeecord.McNativeLauncher;
@@ -49,6 +50,7 @@ public class CloudNetV2PlatformListener implements Listener {
     public CloudNetV2PlatformListener(CloudNetV2Messenger messenger) {
         this.messenger = messenger;
         ProxyServer.getInstance().getPluginManager().registerListener(McNativeLauncher.getPlugin(),this);
+        McNative.getInstance().getLocal().getEventBus().subscribe(ObjectOwner.SYSTEM,this);
         proxyGroup = CloudAPI.getInstance().getProxyGroupData(CloudAPI.getInstance().getGroup());
     }
 
