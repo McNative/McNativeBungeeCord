@@ -234,13 +234,6 @@ public final class McNativeBridgeEventHandler {
             MessageComponent<?> message = handler.getNoFallBackServerMessage(player);
             if(message != null) player.disconnect(message);
         }
-
-        //set global Tablist if available
-        Tablist serverTablist = McNative.getInstance().getLocal().getServerTablist();
-        if(serverTablist != null){
-            serverTablist.addEntry(player);
-            player.setTablist(serverTablist);
-        }
     }
 
     private void handleServerConnected(ServerConnectedEvent event){
@@ -256,6 +249,17 @@ public final class McNativeBridgeEventHandler {
         if(((BungeeProxiedPlayer)player).isFirstJoin()) {
             eventBus.callEvent(MinecraftPlayerLoginConfirmEvent.class, new DefaultMinecraftPlayerLoginConfirmEvent(player));
             ((BungeeProxiedPlayer)player).setFirstJoin(false);
+
+            //set global Tablist if available
+            Tablist serverTablist = McNative.getInstance().getLocal().getServerTablist();
+            if(serverTablist != null){
+                serverTablist.addEntry(player);
+                ((BungeeProxiedPlayer) player).setTablist(serverTablist);
+            }
+        }else{
+            if(((BungeeProxiedPlayer) player).getTablist() != null){
+                ((BungeeProxiedPlayer) player).getTablist().reloadEntry(player);
+            }
         }
     }
 
