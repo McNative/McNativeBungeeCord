@@ -43,6 +43,7 @@ public class CloudNetV3PlatformListener implements Listener {
 
     @EventHandler
     public void onMessageReceive(BungeeChannelMessageReceiveEvent event){
+        System.out.println(event.getChannel()+" | "+event.getMessage());
         this.messenger.handleMessageEvent(event.getChannel(),event.getMessage(),event.getData());
     }
 
