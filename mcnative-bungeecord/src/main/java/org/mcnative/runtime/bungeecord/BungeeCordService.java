@@ -28,6 +28,7 @@ import net.pretronic.libraries.message.bml.variable.VariableSet;
 import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.Validate;
 import org.mcnative.runtime.api.ServerPerformance;
+import org.mcnative.runtime.api.event.service.local.LocalServiceMaxPlayerCountEvent;
 import org.mcnative.runtime.bungeecord.player.BungeeCordPlayerManager;
 import org.mcnative.runtime.bungeecord.server.BungeeCordServerMap;
 import org.mcnative.runtime.api.LocalService;
@@ -45,6 +46,7 @@ import org.mcnative.runtime.api.player.tablist.Tablist;
 import org.mcnative.runtime.api.protocol.packet.PacketManager;
 import org.mcnative.runtime.api.proxy.ProxyService;
 import org.mcnative.runtime.api.text.components.MessageComponent;
+import org.mcnative.runtime.common.event.service.local.DefaultLocalServiceMaxPlayerCountEvent;
 
 import java.net.InetSocketAddress;
 import java.util.*;
@@ -278,9 +280,10 @@ public class BungeeCordService implements LocalService, ProxyServer, ProxyServic
 
     @Override
     public int getMaxPlayerCount() {
-        //LocalServiceMaxPlayerCountEvent
         ListenerInfo info = net.md_5.bungee.api.ProxyServer.getInstance().getConfigurationAdapter().getListeners().iterator().next();
-        return info.getMaxPlayers();
+        LocalServiceMaxPlayerCountEvent event = new DefaultLocalServiceMaxPlayerCountEvent(info.getMaxPlayers());
+        getEventBus().callEvent(LocalServiceMaxPlayerCountEvent.class,event);
+        return event.getMaxPlayerCount();
     }
 
     @Override

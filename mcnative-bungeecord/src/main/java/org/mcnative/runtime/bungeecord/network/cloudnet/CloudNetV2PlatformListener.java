@@ -25,12 +25,16 @@ import de.dytanic.cloudnet.api.network.packet.out.PacketOutLogoutPlayer;
 import de.dytanic.cloudnet.bridge.CloudProxy;
 import de.dytanic.cloudnet.bridge.event.proxied.ProxiedSubChannelMessageEvent;
 import de.dytanic.cloudnet.lib.player.CloudPlayer;
+import de.dytanic.cloudnet.lib.proxylayout.ProxyConfig;
+import de.dytanic.cloudnet.lib.server.ProxyGroup;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
+import org.mcnative.runtime.api.McNative;
+import org.mcnative.runtime.api.event.service.local.LocalServiceMaxPlayerCountEvent;
 import org.mcnative.runtime.bungeecord.McNativeLauncher;
 import org.mcnative.runtime.network.integrations.cloudnet.v2.CloudNetV2Messenger;
 
@@ -40,10 +44,21 @@ import java.util.concurrent.TimeUnit;
 public class CloudNetV2PlatformListener implements Listener {
 
     private final CloudNetV2Messenger messenger;
+    private final ProxyGroup proxyGroup;
 
     public CloudNetV2PlatformListener(CloudNetV2Messenger messenger) {
         this.messenger = messenger;
         ProxyServer.getInstance().getPluginManager().registerListener(McNativeLauncher.getPlugin(),this);
+        proxyGroup = CloudAPI.getInstance().getProxyGroupData(CloudAPI.getInstance().getGroup());
+    }
+
+    @net.pretronic.libraries.event.Listener
+    public void onMaxCount(LocalServiceMaxPlayerCountEvent event){
+        ProxyConfig proxyConfig = proxyGroup.getProxyConfig();
+        int onlineCount = CloudAPI.getInstance().getOnlineCount();
+        int max = (proxyConfig.getAutoSlot().isEnabled() ? onlineCount + proxyConfig.getAutoSlot()
+                .getDynamicSlotSize() : proxyConfig.getMaxPlayers());
+        event.setMaxPlayerCount(max);
     }
 
     @EventHandler
