@@ -45,6 +45,7 @@ import net.pretronic.libraries.utility.GeneralUtil;
 import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.Validate;
 import org.mcnative.runtime.api.loader.LoaderConfiguration;
+import org.mcnative.runtime.api.player.bossbar.BossBar;
 import org.mcnative.runtime.api.player.chat.ChatChannel;
 import org.mcnative.runtime.api.player.profile.GameProfileLoader;
 import org.mcnative.runtime.api.player.tablist.Tablist;
@@ -310,6 +311,7 @@ public class BungeeCordMcNative implements McNative {
         this.factory.registerCreator(ServerStatusResponse.class, parameters -> new BungeeCordServerStatusResponse(new ServerPing()));
         this.factory.registerCreator(ChatChannel.class, parameters -> new DefaultChatChannel());
         this.factory.registerCreator(Tablist.class, parameters -> new BungeeTablist());
+        this.factory.registerCreator(BossBar.class, parameters -> new DefaultBossBar());
 
         this.factory.registerCreator(ServerStatusResponse.PlayerInfo.class, parameters -> {
             if(parameters.length == 1)return new BungeeCordServerStatusResponse.DefaultPlayerInfo((String) parameters[0]);

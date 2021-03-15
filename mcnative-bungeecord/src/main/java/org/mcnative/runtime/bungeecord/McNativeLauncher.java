@@ -43,6 +43,11 @@ import org.mcnative.runtime.api.player.tablist.Tablist;
 import org.mcnative.runtime.api.player.tablist.TablistEntry;
 import org.mcnative.runtime.api.player.tablist.TablistFormatter;
 import org.mcnative.runtime.api.player.tablist.TablistOverviewFormatter;
+import org.mcnative.runtime.api.protocol.Endpoint;
+import org.mcnative.runtime.api.protocol.packet.MinecraftPacketEvent;
+import org.mcnative.runtime.api.protocol.packet.MinecraftPacketListener;
+import org.mcnative.runtime.api.protocol.packet.PacketDirection;
+import org.mcnative.runtime.api.protocol.packet.type.sound.MinecraftSoundEffectPacket;
 import org.mcnative.runtime.api.text.components.MessageComponent;
 import org.mcnative.runtime.api.text.components.MessageKeyComponent;
 import org.mcnative.runtime.api.text.components.TargetMessageKeyComponent;
@@ -136,6 +141,7 @@ public class McNativeLauncher {
                 ,serverMap);
 
         MinecraftJavaProtocol.register(localService.getPacketManager());
+       // MinecraftBossBarPacketCodec.register(localService.getPacketManager());
 
         McNativeConsoleCredentials credentials = setupCredentials(variables);
         BungeeCordMcNative instance = new BungeeCordMcNative(apiVersion,implementationVersion,pluginManager
@@ -178,6 +184,7 @@ public class McNativeLauncher {
         }
 
         logger.info(McNative.CONSOLE_PREFIX+"McNative successfully started.");
+
     }
 
     private static boolean isWaterfallBase(){
