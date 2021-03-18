@@ -101,12 +101,8 @@ public class BungeeCordCommandManager implements CommandManager {
     @Override
     public void registerCommand(Command command) {
         Validate.notNull(command,command.getConfiguration(),command.getOwner());
-        if(!(command.getOwner() instanceof net.pretronic.libraries.plugin.Plugin)){
-            //throw new IllegalArgumentException("Owner is not a plugin.");
-        }
+        if(!command.getConfiguration().isEnabled()) return;
         Plugin plugin = getOriginalPlugin(command.getOwner());
-
-        //if(plugin == null) throw new IllegalArgumentException("Plugin is not enabled");
 
         if(command instanceof CommandManager && ((CommandManager)command).getNoPermissionHandler() == null) {
             ((CommandManager)command).setNoPermissionHandler(DefaultNoPermissionHandler.DEFAULT);
