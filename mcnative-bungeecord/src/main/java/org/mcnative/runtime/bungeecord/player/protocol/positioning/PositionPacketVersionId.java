@@ -42,9 +42,11 @@ public enum PositionPacketVersionId {
     }
 
     public static PositionPacketVersionId get(MinecraftProtocolVersion version){
+        PositionPacketVersionId result = V1_7;
         for (PositionPacketVersionId value : values()) {
-            if(value.getVersion().isOlderOrSame(version)) return value;
+            if(value.getVersion().isNewer(version)) break;
+            result = value;
         }
-        return V1_16;
+        return result;
     }
 }
