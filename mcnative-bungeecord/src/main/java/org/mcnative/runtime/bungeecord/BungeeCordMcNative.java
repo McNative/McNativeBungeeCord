@@ -45,10 +45,13 @@ import net.pretronic.libraries.utility.GeneralUtil;
 import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.Validate;
 import org.mcnative.runtime.api.loader.LoaderConfiguration;
+import org.mcnative.runtime.api.player.bossbar.BossBar;
 import org.mcnative.runtime.api.player.chat.ChatChannel;
 import org.mcnative.runtime.api.player.profile.GameProfileLoader;
+import org.mcnative.runtime.api.player.tablist.Tablist;
 import org.mcnative.runtime.api.utils.Env;
 import org.mcnative.runtime.bungeecord.player.BungeeProxiedPlayer;
+import org.mcnative.runtime.bungeecord.player.BungeeTablist;
 import org.mcnative.runtime.bungeecord.player.permission.BungeeCordPermissionProvider;
 import org.mcnative.runtime.bungeecord.player.permission.BungeeCordPlayerDesign;
 import org.mcnative.runtime.bungeecord.plugin.MappedPlugin;
@@ -69,9 +72,7 @@ import org.mcnative.runtime.api.serviceprovider.placeholder.PlaceholderProvider;
 import org.mcnative.runtime.api.text.format.ColoredString;
 import org.mcnative.runtime.common.DefaultLoaderConfiguration;
 import org.mcnative.runtime.common.DefaultObjectFactory;
-import org.mcnative.runtime.common.player.DefaultChatChannel;
-import org.mcnative.runtime.common.player.MemoryGameProfileLoader;
-import org.mcnative.runtime.common.player.OfflineMinecraftPlayer;
+import org.mcnative.runtime.common.player.*;
 import org.mcnative.runtime.common.player.data.DefaultPlayerDataProvider;
 import org.mcnative.runtime.common.plugin.configuration.DefaultConfigurationProvider;
 import org.mcnative.runtime.common.serviceprovider.McNativePlaceholderProvider;
@@ -283,6 +284,8 @@ public class BungeeCordMcNative implements McNative {
 
     protected void registerDefaultDescribers(){
         VariableDescriberRegistry.registerDescriber(PlayerDesign.class);
+        VariableDescriberRegistry.registerDescriber(DefaultPlayerDesign.class);
+        VariableDescriberRegistry.registerDescriber(EmptyPlayerDesign.class);
         VariableDescriberRegistry.registerDescriber(MinecraftPlugin.class);
         VariableDescriberRegistry.registerDescriber(PluginDescription.class);
         VariableDescriberRegistry.registerDescriber(DefaultPluginDescription.class);
@@ -307,6 +310,8 @@ public class BungeeCordMcNative implements McNative {
     protected void registerDefaultCreators(){
         this.factory.registerCreator(ServerStatusResponse.class, parameters -> new BungeeCordServerStatusResponse(new ServerPing()));
         this.factory.registerCreator(ChatChannel.class, parameters -> new DefaultChatChannel());
+        this.factory.registerCreator(Tablist.class, parameters -> new BungeeTablist());
+        this.factory.registerCreator(BossBar.class, parameters -> new DefaultBossBar());
 
         this.factory.registerCreator(ServerStatusResponse.PlayerInfo.class, parameters -> {
             if(parameters.length == 1)return new BungeeCordServerStatusResponse.DefaultPlayerInfo((String) parameters[0]);

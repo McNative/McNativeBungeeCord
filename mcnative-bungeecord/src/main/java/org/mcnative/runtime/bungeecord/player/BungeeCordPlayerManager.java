@@ -22,12 +22,14 @@ package org.mcnative.runtime.bungeecord.player;
 import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.annonations.Internal;
 import org.mcnative.runtime.api.player.ConnectedMinecraftPlayer;
+import org.mcnative.runtime.api.player.MinecraftPlayer;
 import org.mcnative.runtime.api.player.OnlineMinecraftPlayer;
 import org.mcnative.runtime.common.player.AbstractPlayerManager;
 
 import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 
 public class BungeeCordPlayerManager extends AbstractPlayerManager {
 
@@ -66,6 +68,7 @@ public class BungeeCordPlayerManager extends AbstractPlayerManager {
     @Internal
     public void registerPlayer(ConnectedMinecraftPlayer player){
         this.onlineMinecraftPlayers.add(player);
+        this.offlineMinecraftPlayers.remove(player0 -> player0.getUniqueId().equals(player.getUniqueId()));
     }
 
     @Internal

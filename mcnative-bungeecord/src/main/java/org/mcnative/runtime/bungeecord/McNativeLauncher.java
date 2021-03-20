@@ -30,13 +30,27 @@ import net.pretronic.libraries.command.command.configuration.DefaultCommandConfi
 import net.pretronic.libraries.document.DocumentRegistry;
 import net.pretronic.libraries.event.DefaultEventBus;
 import net.pretronic.libraries.logging.bridge.JdkPretronicLogger;
+import net.pretronic.libraries.message.bml.variable.VariableSet;
 import net.pretronic.libraries.plugin.description.PluginVersion;
 import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.interfaces.ObjectOwner;
-import net.pretronic.libraries.utility.reflect.ReflectException;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import net.pretronic.libraries.utility.reflect.UnsafeInstanceCreator;
 import org.mcnative.runtime.api.McNativeConsoleCredentials;
+import org.mcnative.runtime.api.connection.MinecraftConnection;
+import org.mcnative.runtime.api.player.ConnectedMinecraftPlayer;
+import org.mcnative.runtime.api.player.tablist.Tablist;
+import org.mcnative.runtime.api.player.tablist.TablistEntry;
+import org.mcnative.runtime.api.player.tablist.TablistFormatter;
+import org.mcnative.runtime.api.player.tablist.TablistOverviewFormatter;
+import org.mcnative.runtime.api.protocol.Endpoint;
+import org.mcnative.runtime.api.protocol.packet.MinecraftPacketEvent;
+import org.mcnative.runtime.api.protocol.packet.MinecraftPacketListener;
+import org.mcnative.runtime.api.protocol.packet.PacketDirection;
+import org.mcnative.runtime.api.protocol.packet.type.sound.MinecraftSoundEffectPacket;
+import org.mcnative.runtime.api.text.components.MessageComponent;
+import org.mcnative.runtime.api.text.components.MessageKeyComponent;
+import org.mcnative.runtime.api.text.components.TargetMessageKeyComponent;
 import org.mcnative.runtime.api.utils.Env;
 import org.mcnative.runtime.bungeecord.event.McNativeBridgeEventHandler;
 import org.mcnative.runtime.bungeecord.network.McNativeGlobalActionListener;
@@ -45,6 +59,7 @@ import org.mcnative.runtime.bungeecord.network.bungeecord.BungeecordProxyNetwork
 import org.mcnative.runtime.bungeecord.network.cloudnet.CloudNetV2PlatformListener;
 import org.mcnative.runtime.bungeecord.network.cloudnet.CloudNetV3PlatformListener;
 import org.mcnative.runtime.bungeecord.player.BungeeCordPlayerManager;
+import org.mcnative.runtime.bungeecord.player.BungeeTablist;
 import org.mcnative.runtime.bungeecord.plugin.BungeeCordPluginManager;
 import org.mcnative.runtime.bungeecord.plugin.McNativeBungeeEventBus;
 import org.mcnative.runtime.bungeecord.plugin.command.BungeeCordCommandManager;
@@ -126,6 +141,7 @@ public class McNativeLauncher {
                 ,serverMap);
 
         MinecraftJavaProtocol.register(localService.getPacketManager());
+       // MinecraftBossBarPacketCodec.register(localService.getPacketManager());
 
         McNativeConsoleCredentials credentials = setupCredentials(variables);
         BungeeCordMcNative instance = new BungeeCordMcNative(apiVersion,implementationVersion,pluginManager
@@ -144,7 +160,6 @@ public class McNativeLauncher {
 
         proxy.setConfigurationAdapter(new McNativeConfigurationAdapter(proxy.getConfigurationAdapter()));
         logger.info(McNative.CONSOLE_PREFIX+"McNative has overwritten the configuration adapter.");
-
 
         McNativeBridgedEventBus eventBus;
         if(isWaterfallBase()){
@@ -169,6 +184,7 @@ public class McNativeLauncher {
         }
 
         logger.info(McNative.CONSOLE_PREFIX+"McNative successfully started.");
+
     }
 
     private static boolean isWaterfallBase(){
@@ -204,23 +220,6 @@ public class McNativeLauncher {
         }
     }
 
-    private static void setupConfiguredServices(){
-        if(McNativeBungeeCordConfiguration.PLAYER_GLOBAL_CHAT_ENABLED){
-            ChatChannel serverChat = ChatChannel.newChatChannel();
-            serverChat.setName("ServerChat");
-            serverChat.setMessageFormatter((GroupChatFormatter) (sender, variables, message) -> McNativeBungeeCordConfiguration.PLAYER_GLOBAL_CHAT);
-            McNative.getInstance().getLocal().setServerChat(serverChat);
-        }
-
-        //Motd setup
-        File serverIcon = new File("server-icon.png");
-        if(!serverIcon.exists()){
-            try{
-                McNativeBridgeEventHandler.DEFAULT_FAVICON = Favicon.create(ImageIO.read(ServerStatusResponse.DEFAULT_FAVICON_URL));
-            }catch (Exception ignored){}
-        }
-    }
-
     protected static void shutdown(){
         if(!McNative.isAvailable()) return;
         Logger logger = ProxyServer.getInstance().getLogger();
@@ -235,6 +234,65 @@ public class McNativeLauncher {
             instance.getExecutorService().shutdown();
             instance.getPluginManager().shutdown();
             ((BungeeCordMcNative)instance).setReady(false);
+        }
+    }
+
+    private static void setupConfiguredServices() {
+        if (McNativeBungeeCordConfiguration.PLAYER_GLOBAL_CHAT_ENABLED) {
+            ChatChannel serverChat = ChatChannel.newChatChannel();
+            serverChat.setName("ServerChat");
+            serverChat.setMessageFormatter((GroupChatFormatter) (sender, variables, message) -> McNativeBungeeCordConfiguration.PLAYER_GLOBAL_CHAT);
+            McNative.getInstance().getLocal().setServerChat(serverChat);
+        }
+
+        //Motd setup
+        File serverIcon = new File("server-icon.png");
+        if (!serverIcon.exists()) {
+            try {
+                McNativeBridgeEventHandler.DEFAULT_FAVICON = Favicon.create(ImageIO.read(ServerStatusResponse.DEFAULT_FAVICON_URL));
+            } catch (Exception ignored) {
+            }
+        }
+
+        if (McNativeBungeeCordConfiguration.PLAYER_GLOBAL_TABLIST_ENABLED) {
+            Tablist tablist = new BungeeTablist();
+            tablist.setFormatter(new TablistFormatter() {
+                @Override
+                public MessageComponent<?> formatPrefix(ConnectedMinecraftPlayer player, TablistEntry entry, VariableSet variables) {
+                    if (entry instanceof MinecraftConnection) {
+                        return new TargetMessageKeyComponent((MinecraftConnection) entry, McNativeBungeeCordConfiguration.PLAYER_GLOBAL_TABLIST_PREFIX_LOADED);
+                    } else {
+                        return new MessageKeyComponent(McNativeBungeeCordConfiguration.PLAYER_GLOBAL_TABLIST_PREFIX_LOADED);
+                    }
+                }
+
+                @Override
+                public MessageComponent<?> formatSuffix(ConnectedMinecraftPlayer player, TablistEntry entry, VariableSet variables) {
+                    if (entry instanceof MinecraftConnection) {
+                        return new TargetMessageKeyComponent((MinecraftConnection) entry, McNativeBungeeCordConfiguration.PLAYER_GLOBAL_TABLIST_SUFFIX_LOADED);
+                    } else {
+                        return new MessageKeyComponent(McNativeBungeeCordConfiguration.PLAYER_GLOBAL_TABLIST_SUFFIX_LOADED);
+                    }
+                }
+            });
+
+            if (McNativeBungeeCordConfiguration.PLAYER_GLOBAL_TABLIST_OVERVIEW_ENABLED) {
+                tablist.setOverviewFormatter(new TablistOverviewFormatter() {
+
+                    @Override
+                    public MessageComponent<?> formatHeader(ConnectedMinecraftPlayer receiver, VariableSet headerVariables, VariableSet footerVariables) {
+                        return McNativeBungeeCordConfiguration.PLAYER_GLOBAL_TABLIST_OVERVIEW_HEADER_LOADED;
+                    }
+
+                    @Override
+                    public MessageComponent<?> formatFooter(ConnectedMinecraftPlayer receiver, VariableSet headerVariables, VariableSet footerVariables) {
+                        return McNativeBungeeCordConfiguration.PLAYER_GLOBAL_TABLIST_OVERVIEW_FOOTER_LOADED;
+                    }
+                });
+            }
+
+            McNative.getInstance().getLocal().setServerTablist(tablist);
+            McNative.getInstance().getLocal().getEventBus().subscribe(ObjectOwner.SYSTEM, tablist);
         }
     }
 
@@ -263,5 +321,6 @@ public class McNativeLauncher {
             McNativeLauncher.shutdown();
         }
     }
+
 
 }

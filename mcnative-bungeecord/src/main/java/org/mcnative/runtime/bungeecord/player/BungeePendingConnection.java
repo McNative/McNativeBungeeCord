@@ -19,17 +19,19 @@
 
 package org.mcnative.runtime.bungeecord.player;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import net.pretronic.libraries.message.bml.variable.VariableSet;
 import net.pretronic.libraries.utility.Validate;
 import net.pretronic.libraries.utility.annonations.Internal;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.mcnative.runtime.api.connection.MinecraftOutputStream;
+import org.mcnative.runtime.api.player.ConnectedMinecraftPlayer;
 import org.mcnative.runtime.bungeecord.McNativeBungeeCordConfiguration;
 import org.mcnative.runtime.api.McNative;
 import org.mcnative.runtime.api.connection.ConnectionState;
 import org.mcnative.runtime.api.connection.PendingConnection;
-import org.mcnative.runtime.api.player.OnlineMinecraftPlayer;
 import org.mcnative.runtime.api.player.profile.GameProfile;
 import org.mcnative.runtime.api.protocol.Endpoint;
 import org.mcnative.runtime.api.protocol.MinecraftEdition;
@@ -38,13 +40,14 @@ import org.mcnative.runtime.api.protocol.packet.MinecraftPacket;
 import org.mcnative.runtime.api.protocol.packet.PacketDirection;
 import org.mcnative.runtime.api.protocol.packet.type.MinecraftDisconnectPacket;
 import org.mcnative.runtime.api.text.components.MessageComponent;
+import org.mcnative.runtime.bungeecord.player.protocol.BungeeMinecraftProtocolRewriteDecoder;
 import org.mcnative.runtime.protocol.java.netty.MinecraftProtocolEncoder;
-import org.mcnative.runtime.protocol.java.netty.rewrite.MinecraftProtocolRewriteDecoder;
 import org.mcnative.runtime.protocol.java.netty.rewrite.MinecraftProtocolRewriteEncoder;
 
 import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.net.InetSocketAddress;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -66,7 +69,7 @@ public class BungeePendingConnection implements PendingConnection {
     private final MinecraftProtocolVersion version;
 
     private ConnectionState state;
-    private OnlineMinecraftPlayer player;
+    private ConnectedMinecraftPlayer player;
 
     public BungeePendingConnection(net.md_5.bungee.api.connection.PendingConnection original) {
         this.original = original;
@@ -126,7 +129,7 @@ public class BungeePendingConnection implements PendingConnection {
     }
 
     @Override
-    public OnlineMinecraftPlayer getPlayer() {
+    public ConnectedMinecraftPlayer getPlayer() {
         return player;
     }
 
@@ -152,7 +155,7 @@ public class BungeePendingConnection implements PendingConnection {
 
     @Override
     public boolean isConnected() {
-        return original.isConnected();
+        return channel.isOpen() && channel.isActive() && channel.isRegistered();
     }
 
     @Override
@@ -182,6 +185,7 @@ public class BungeePendingConnection implements PendingConnection {
 
     @Override
     public void sendPacket(MinecraftPacket packet) {
+        packet.validate();
         if(channel.isOpen() && channel.isActive() && channel.isRegistered()){
             channel.writeAndFlush(packet);
         }
@@ -190,6 +194,13 @@ public class BungeePendingConnection implements PendingConnection {
     @Override
     public void sendLocalLoopPacket(MinecraftPacket packet) {
         throw new UnsupportedOperationException("Coming soon");
+    }
+
+    @Override
+    public void sendRawPacket(ByteBuf buffer) {
+        if(isConnected()){
+            channel.writeAndFlush(buffer);
+        }
     }
 
     @Override
@@ -208,7 +219,7 @@ public class BungeePendingConnection implements PendingConnection {
     }
 
     @Internal
-    public void setPlayer(OnlineMinecraftPlayer player){
+    public void setPlayer(ConnectedMinecraftPlayer player){
         this.player = player;
     }
 
@@ -224,9 +235,13 @@ public class BungeePendingConnection implements PendingConnection {
         this.channel.pipeline().addAfter("packet-encoder","mcnative-packet-rewrite-encoder"
                 ,new MinecraftProtocolRewriteEncoder(McNative.getInstance().getLocal().getPacketManager()
                         ,Endpoint.UPSTREAM, PacketDirection.OUTGOING,this));
+    }
 
+    @Internal
+    public void injectPostUpstreamProtocolHandlersToPipeline(){
+        if(!McNativeBungeeCordConfiguration.NETWORK_PACKET_MANIPULATION_UPSTREAM_ENABLED) return;
         this.channel.pipeline().addBefore("packet-decoder","mcnative-packet-rewrite-decoder"
-                ,new MinecraftProtocolRewriteDecoder(McNative.getInstance().getLocal().getPacketManager()
+                ,new BungeeMinecraftProtocolRewriteDecoder(McNative.getInstance().getLocal().getPacketManager()
                         ,Endpoint.UPSTREAM, PacketDirection.INCOMING,this));
     }
 

@@ -40,10 +40,7 @@ import org.mcnative.runtime.api.McNative;
 import org.mcnative.runtime.api.player.OnlineMinecraftPlayer;
 import org.mcnative.runtime.common.plugin.DefaultNoPermissionHandler;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BungeeCordCommandManager implements CommandManager {
 
@@ -51,11 +48,13 @@ public class BungeeCordCommandManager implements CommandManager {
     private final PluginManager original;
     private final List<Command> commands;
     private NoPermissionHandler noPermissionHandler;
+    private final Map<ObjectOwner, NoPermissionHandler> objectOwnerNoPermissionHandler;
 
     public BungeeCordCommandManager(BungeeCordPluginManager pluginManager, PluginManager original) {
         this.pluginManager = pluginManager;
         this.original = original;
         this.commands = new ArrayList<>();
+        this.objectOwnerNoPermissionHandler = new HashMap<>();
         inject();
     }
 
@@ -86,6 +85,20 @@ public class BungeeCordCommandManager implements CommandManager {
     }
 
     @Override
+    public NoPermissionHandler getNoPermissionHandler(ObjectOwner objectOwner) {
+        Validate.notNull(objectOwner);
+        NoPermissionHandler handler = this.objectOwnerNoPermissionHandler.get(objectOwner);
+        if(handler == null) handler = getNoPermissionHandler();
+        return handler;
+    }
+
+    @Override
+    public void setNoPermissionHandler(ObjectOwner objectOwner, NoPermissionHandler noPermissionHandler) {
+        Validate.notNull(objectOwner, noPermissionHandler);
+        this.objectOwnerNoPermissionHandler.put(objectOwner, noPermissionHandler);
+    }
+
+    @Override
     public void dispatchCommand(CommandSender sender, String command) {
         net.md_5.bungee.api.CommandSender mappedSender;
         if(sender instanceof OnlineMinecraftPlayer){
@@ -101,14 +114,10 @@ public class BungeeCordCommandManager implements CommandManager {
     @Override
     public void registerCommand(Command command) {
         Validate.notNull(command,command.getConfiguration(),command.getOwner());
-        if(!(command.getOwner() instanceof net.pretronic.libraries.plugin.Plugin)){
-            //throw new IllegalArgumentException("Owner is not a plugin.");
-        }
+        if(!command.getConfiguration().isEnabled()) return;
         Plugin plugin = getOriginalPlugin(command.getOwner());
 
-        //if(plugin == null) throw new IllegalArgumentException("Plugin is not enabled");
-
-        if(command instanceof CommandManager && ((CommandManager)command).getNoPermissionHandler() == null) {
+        if(command instanceof CommandManager && ((CommandManager)command).getNoPermissionHandler(command.getOwner()) == null) {
             ((CommandManager)command).setNoPermissionHandler(DefaultNoPermissionHandler.DEFAULT);
         }
 

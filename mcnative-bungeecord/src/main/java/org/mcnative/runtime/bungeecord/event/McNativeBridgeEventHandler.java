@@ -20,6 +20,8 @@
 
 package org.mcnative.runtime.bungeecord.event;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.md_5.bungee.api.Favicon;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.SkinConfiguration;
@@ -29,9 +31,17 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.*;
 import net.pretronic.libraries.command.sender.CommandSender;
 import net.pretronic.libraries.event.EventBus;
+import net.pretronic.libraries.utility.interfaces.ObjectOwner;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.mcnative.runtime.api.event.player.login.MinecraftPlayerLoginConfirmEvent;
+import org.mcnative.runtime.api.player.bossbar.BarColor;
+import org.mcnative.runtime.api.player.bossbar.BarDivider;
+import org.mcnative.runtime.api.player.bossbar.BarFlag;
+import org.mcnative.runtime.api.player.bossbar.BossBar;
+import org.mcnative.runtime.api.player.sound.MinecraftSound;
+import org.mcnative.runtime.api.player.tablist.Tablist;
 import org.mcnative.runtime.api.proxy.ServerConnectHandler;
+import org.mcnative.runtime.api.text.Text;
 import org.mcnative.runtime.bungeecord.event.player.*;
 import org.mcnative.runtime.bungeecord.event.server.BungeeServerConnectEvent;
 import org.mcnative.runtime.bungeecord.event.server.BungeeServerConnectedEvent;
@@ -70,11 +80,14 @@ import org.mcnative.runtime.api.text.components.MessageComponent;
 import org.mcnative.runtime.bungeecord.shared.McNativeBridgedEventBus;
 import org.mcnative.runtime.common.event.player.DefaultMinecraftPlayerLoginConfirmEvent;
 import org.mcnative.runtime.common.event.service.local.DefaultLocalServiceReloadEvent;
+import org.mcnative.runtime.common.player.DefaultBossBar;
+import org.mcnative.runtime.protocol.java.MinecraftProtocolUtil;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public final class McNativeBridgeEventHandler {
 
@@ -217,6 +230,7 @@ public final class McNativeBridgeEventHandler {
         playerManager.registerPlayer(player);
         MinecraftPlayerPostLoginEvent mcNativeEvent = new BungeeMinecraftPostLoginEvent(player);
         eventBus.callEvents(PostLoginEvent.class,event,mcNativeEvent);
+        player.getPendingConnection().injectPostUpstreamProtocolHandlersToPipeline();
     }
 
     private void handleServerConnect(ServerConnectEvent event){
@@ -236,7 +250,7 @@ public final class McNativeBridgeEventHandler {
     }
 
     private void handleServerConnected(ServerConnectedEvent event){
-        OnlineMinecraftPlayer player = playerManager.getMappedPlayer(event.getPlayer());
+        ConnectedMinecraftPlayer player = playerManager.getMappedPlayer(event.getPlayer());
         MinecraftServer server = serverMap.getMappedServer(event.getServer().getInfo());
         MinecraftPlayerServerConnectedEvent mcNativeEvent = new BungeeServerConnectedEvent(player,server);
 
@@ -248,6 +262,17 @@ public final class McNativeBridgeEventHandler {
         if(((BungeeProxiedPlayer)player).isFirstJoin()) {
             eventBus.callEvent(MinecraftPlayerLoginConfirmEvent.class, new DefaultMinecraftPlayerLoginConfirmEvent(player));
             ((BungeeProxiedPlayer)player).setFirstJoin(false);
+
+            //set global Tablist if available
+            Tablist serverTablist = McNative.getInstance().getLocal().getServerTablist();
+            if(serverTablist != null){
+                serverTablist.addEntry(player);
+                player.setTablist(serverTablist);
+            }
+        }else{
+            if(player.getTablist() != null){
+                player.getTablist().reloadEntry(player);
+            }
         }
     }
 
@@ -281,6 +306,11 @@ public final class McNativeBridgeEventHandler {
         MinecraftPlayerLogoutEvent mcNativeEvent = new BungeeMinecraftLogoutEvent(player);
         eventBus.callEvents(PlayerDisconnectEvent.class,event,mcNativeEvent);
         playerManager.unregisterPlayer(event.getPlayer().getUniqueId());
+
+        player.setTablist(null);
+        ((BungeeProxiedPlayer)player).clearBossBar();
+        Tablist serverTablist = McNative.getInstance().getLocal().getServerTablist();
+        if(serverTablist != null) serverTablist.removeEntry(player);
     }
 
     private void handleChatEvent(ChatEvent event) {

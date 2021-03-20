@@ -35,6 +35,7 @@ public class BungeeCordPermissionHandler implements PermissionHandler {
     public BungeeCordPermissionHandler(BungeeProxiedPlayer player) {
         this.player = player;
         this.design = new BungeeCordPlayerDesign(player.getOriginal());
+        player.setDesign(design);
     }
 
     @Override
