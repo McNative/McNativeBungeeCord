@@ -46,7 +46,7 @@
         <url>https://mcnative.org</url>
     </organization>
 
-    <properties>Up
+    <properties>
         <!-- Project settings -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
