@@ -31,6 +31,8 @@ import org.mcnative.runtime.api.network.messaging.MessagingChannelListener;
 import org.mcnative.runtime.api.player.ConnectedMinecraftPlayer;
 import org.mcnative.runtime.api.player.Title;
 import org.mcnative.runtime.api.player.chat.ChatPosition;
+import org.mcnative.runtime.api.player.sound.SoundCategory;
+import org.mcnative.runtime.api.protocol.packet.MinecraftPacket;
 import org.mcnative.runtime.api.proxy.ProxyService;
 import org.mcnative.runtime.api.text.Text;
 import org.mcnative.runtime.api.text.components.MessageComponent;
@@ -97,6 +99,24 @@ public class McNativePlayerActionListener implements MessagingChannelListener {
                 player.sendTitle(title);
             }else if(action.equalsIgnoreCase("resetTitle")){
                 player.resetTitle();
+            }else if(action.equalsIgnoreCase("playSound")){
+                player.playSound(request.getString("sound")
+                        ,request.getObject("category", SoundCategory.class)
+                        ,request.getFloat("volume")
+                        ,request.getFloat("pitch"));
+            }else if(action.equalsIgnoreCase("stopSound")){
+                String sound = request.getString("sound");
+                SoundCategory category = request.getObject("category", SoundCategory.class);
+
+                if(sound != null && category != null) player.stopSound(sound,category);
+                else if(sound != null) player.stopSound(sound);
+                else if(category != null) player.stopSound(category);
+                else  player.stopSound();
+
+            }else if(action.equalsIgnoreCase("sendPacket")){
+                Class<?> packetClass = request.getObject("packetClass",Class.class);
+                Object packet = request.getObject("packetData",packetClass);
+                player.sendPacket((MinecraftPacket) packet);
             }
         }
         return null;

@@ -72,18 +72,31 @@ public class McNativeBungeeCordConfiguration {
     public static boolean PLAYER_GLOBAL_CHAT_ENABLED = false;
     public static String PLAYER_GLOBAL_CHAT_FORMAT = "&8[{player.server}&8] &e{design.chat}{player.name}&8:&f {message}";
 
+    public static boolean PLAYER_GLOBAL_TABLIST_ENABLED = false;
+
+    public static String PLAYER_GLOBAL_TABLIST_PREFIX = "{design.prefix}";
+    public static String PLAYER_GLOBAL_TABLIST_SUFFIX = "{design.suffix}";
+
+    public static boolean PLAYER_GLOBAL_TABLIST_OVERVIEW_ENABLED = false;
+    public static String PLAYER_GLOBAL_TABLIST_OVERVIEW_HEADER = "&4Header";
+    public static String PLAYER_GLOBAL_TABLIST_OVERVIEW_FOOTER = "&8Footer";
+
+    public static transient Message PLAYER_GLOBAL_TABLIST_PREFIX_LOADED;
+    public static transient Message PLAYER_GLOBAL_TABLIST_SUFFIX_LOADED;
     public static transient MessageComponent<?> PLAYER_GLOBAL_CHAT;
+    public static transient MessageComponent<?> PLAYER_GLOBAL_TABLIST_OVERVIEW_HEADER_LOADED;
+    public static transient MessageComponent<?> PLAYER_GLOBAL_TABLIST_OVERVIEW_FOOTER_LOADED;
+
+    @DocumentKey("network.messaging.packetManipulation.upstream")
+    public static boolean NETWORK_PACKET_MANIPULATION_UPSTREAM_ENABLED = true;
+    @DocumentKey("network.messaging.packetManipulation.downstream")
+    public static boolean NETWORK_PACKET_MANIPULATION_DOWNSTREAM_ENABLED = false;
 
     static{
         PLAYER_COLORS_COLORS.put("mcnative.player.color.administrator","&4");
         PLAYER_COLORS_COLORS.put("mcnative.player.color.moderator","&c");
         PLAYER_COLORS_COLORS.put("mcnative.player.color.premium","&6");
     }
-
-    @DocumentKey("network.messaging.packetManipulation.upstream")
-    public static boolean NETWORK_PACKET_MANIPULATION_UPSTREAM_ENABLED = true;
-    @DocumentKey("network.messaging.packetManipulation.downstream")
-    public static boolean NETWORK_PACKET_MANIPULATION_DOWNSTREAM_ENABLED = false;
 
     public static boolean load(PretronicLogger logger, File location){
         OfflineMinecraftPlayer.DISPLAY_NAME_FORMAT = PLAYER_DISPLAY_NAME_FORMAT;
@@ -125,13 +138,17 @@ public class McNativeBungeeCordConfiguration {
     }
 
     public static void postLoad(){
-        PLAYER_GLOBAL_CHAT = parseCustomMessage(PLAYER_GLOBAL_CHAT_FORMAT);
+        PLAYER_GLOBAL_TABLIST_PREFIX_LOADED = parseCustomMessage(PLAYER_GLOBAL_TABLIST_PREFIX);
+        PLAYER_GLOBAL_TABLIST_SUFFIX_LOADED = parseCustomMessage(PLAYER_GLOBAL_TABLIST_SUFFIX);
+
+        PLAYER_GLOBAL_TABLIST_OVERVIEW_HEADER_LOADED = new MessageKeyComponent(parseCustomMessage(PLAYER_GLOBAL_TABLIST_OVERVIEW_HEADER));
+        PLAYER_GLOBAL_TABLIST_OVERVIEW_FOOTER_LOADED = new MessageKeyComponent(parseCustomMessage(PLAYER_GLOBAL_TABLIST_OVERVIEW_FOOTER));
+        PLAYER_GLOBAL_CHAT = new MessageKeyComponent(parseCustomMessage(PLAYER_GLOBAL_CHAT_FORMAT));
     }
 
-    private static MessageComponent<?> parseCustomMessage(String input){
-        Message message = new MessageParser(McNative.getInstance().getRegistry()
+    private static Message parseCustomMessage(String input){
+        return new MessageParser(McNative.getInstance().getRegistry()
                 .getService(MessageProvider.class).getProcessor(),input).parse();
-        return new MessageKeyComponent(message);
     }
 
     public static class ConfiguredServer {

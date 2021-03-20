@@ -5,7 +5,7 @@
     <parent>
         <artifactId>McNativeBungeeCord</artifactId>
         <groupId>org.mcnative.runtime.bungeecord</groupId>
-        <version>1.14.2.115-BETA</version>
+        <version>1.15.16.136-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -90,6 +90,13 @@
             <groupId>de.dytanic.cloudnet</groupId>
             <artifactId>cloudnet-api-bridge</artifactId>
             <version>${dependency.cloudnet.v2}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>de.dytanic.cloudnet</groupId>
+            <artifactId>cloudnet-syncproxy</artifactId>
+            <version>${dependency.cloudnet.v3}</version>
             <scope>provided</scope>
         </dependency>
 

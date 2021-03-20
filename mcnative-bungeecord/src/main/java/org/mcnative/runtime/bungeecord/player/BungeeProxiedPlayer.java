@@ -19,6 +19,7 @@
 
 package org.mcnative.runtime.bungeecord.player;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerConnectRequest;
@@ -29,6 +30,10 @@ import net.pretronic.libraries.utility.annonations.Internal;
 import net.pretronic.libraries.utility.interfaces.ObjectOwner;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.mcnative.runtime.api.connection.MinecraftOutputStream;
+import org.mcnative.runtime.api.player.tablist.TablistEntry;
+import org.mcnative.runtime.api.protocol.packet.type.sound.MinecraftSoundEffectPacket;
+import org.mcnative.runtime.api.protocol.packet.type.sound.MinecraftStopSoundPacket;
+import org.mcnative.runtime.api.utils.positioning.Position;
 import org.mcnative.runtime.bungeecord.McNativeBungeeCordConfiguration;
 import org.mcnative.runtime.bungeecord.server.BungeeCordServerMap;
 import org.mcnative.runtime.bungeecord.server.WrappedBungeeMinecraftServer;
@@ -45,9 +50,6 @@ import org.mcnative.runtime.api.player.chat.ChatPosition;
 import org.mcnative.runtime.api.player.data.MinecraftPlayerData;
 import org.mcnative.runtime.api.player.scoreboard.BelowNameInfo;
 import org.mcnative.runtime.api.player.scoreboard.sidebar.Sidebar;
-import org.mcnative.runtime.api.player.sound.Instrument;
-import org.mcnative.runtime.api.player.sound.Note;
-import org.mcnative.runtime.api.player.sound.Sound;
 import org.mcnative.runtime.api.player.sound.SoundCategory;
 import org.mcnative.runtime.api.player.tablist.Tablist;
 import org.mcnative.runtime.api.protocol.Endpoint;
@@ -59,14 +61,16 @@ import org.mcnative.runtime.api.protocol.packet.type.MinecraftResourcePackSendPa
 import org.mcnative.runtime.api.protocol.packet.type.MinecraftTitlePacket;
 import org.mcnative.runtime.api.text.Text;
 import org.mcnative.runtime.api.text.components.MessageComponent;
+import org.mcnative.runtime.common.player.DefaultBossBar;
 import org.mcnative.runtime.common.player.OfflineMinecraftPlayer;
+import org.mcnative.runtime.common.player.tablist.AbstractTablist;
+import org.mcnative.runtime.common.utils.positioning.DefaultPosition;
 import org.mcnative.runtime.protocol.java.netty.rewrite.MinecraftProtocolRewriteDecoder;
 import org.mcnative.runtime.protocol.java.netty.rewrite.MinecraftProtocolRewriteEncoder;
 
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.util.Collection;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -74,14 +78,13 @@ import java.util.concurrent.TimeUnit;
 @Todo In proxy player
     - Below Name
     - Sidebar
-    - Tablist
-    - Bossbar
-    - Sound / Note
+    - Tablist => Fehler mit fake player
  */
 public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements ConnectedMinecraftPlayer {
 
     private final BungeeCordServerMap serverMap;
     private final BungeePendingConnection connection;
+    private final Position position;
 
     private net.md_5.bungee.api.connection.ProxiedPlayer original;
 
@@ -90,6 +93,11 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
 
     private ChatChannel chatChannel;
 
+    private Tablist tablist;
+    private final Collection<BossBar> bossBars;
+    private final Map<TablistEntry,String> tablistTeamNames;
+    private int tablistTeamIndex;
+
     private boolean firstJoin;
 
     public BungeeProxiedPlayer(BungeeCordServerMap serverMap,BungeePendingConnection connection, MinecraftPlayerData playerData) {
@@ -97,6 +105,11 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
         this.serverMap = serverMap;
         this.connection = connection;
         this.firstJoin = true;
+
+        this.tablistTeamNames = new HashMap<>();
+        this.tablistTeamIndex = 0;
+        this.position = new DefaultPosition();
+        this.bossBars = new ArrayList<>();
     }
 
     @Internal
@@ -250,12 +263,19 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
 
     @Override
     public Tablist getTablist() {
-        throw new UnsupportedOperationException("Coming soon");
+        return tablist;
     }
 
     @Override
     public void setTablist(Tablist tablist) {
-        throw new UnsupportedOperationException("Coming soon");
+        if(this.tablist != null){
+            ((AbstractTablist)this.tablist).detachReceiver(this);
+        }
+        this.tablistTeamNames.clear();
+        if(tablist != null){
+            this.tablist = tablist;
+            ((AbstractTablist)this.tablist).attachReceiver(this);
+        }
     }
 
     @Override
@@ -347,38 +367,32 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
 
     @Override
     public Collection<BossBar> getActiveBossBars() {
-        throw new UnsupportedOperationException("Coming soon");
+        return this.bossBars;
     }
 
     @Override
     public void addBossBar(BossBar bossBar) {
-        throw new UnsupportedOperationException("Coming soon");
+        if(!this.bossBars.contains(bossBar)){
+            this.bossBars.add(bossBar);
+            ((DefaultBossBar)bossBar).attachReceiver(this);
+        }
     }
 
     @Override
     public void removeBossBar(BossBar bossBar) {
-        throw new UnsupportedOperationException("Coming soon");
+        if(this.bossBars.contains(bossBar)){
+            this.bossBars.remove(bossBar);
+            ((DefaultBossBar)bossBar).detachReceiver(this);
+        }
     }
 
-    @Override
-    public void playNote(Instrument instrument, Note note) {
-        throw new UnsupportedOperationException("Coming soon");
+    public void clearBossBar(){
+        for (BossBar bossBar : this.bossBars) {
+            ((DefaultBossBar)bossBar).detachReceiver(this);
+        }
+        this.bossBars.clear();
     }
 
-    @Override
-    public void playSound(Sound sound, SoundCategory category, float volume, float pitch) {
-        throw new UnsupportedOperationException("Coming soon");
-    }
-
-    @Override
-    public void stopSound(Sound sound) {
-        throw new UnsupportedOperationException("Coming soon");
-    }
-
-    @Override
-    public void stopSound(String sound, SoundCategory category) {
-        throw new UnsupportedOperationException("Coming soon");
-    }
 
     @Override
     public void sendResourcePackRequest(String url) {
@@ -419,8 +433,58 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
     }
 
     @Override
+    public void playSound(String sound, SoundCategory category, float volume, float pitch) {
+        MinecraftSoundEffectPacket packet = new MinecraftSoundEffectPacket();
+        packet.setSoundName(sound);
+        packet.setCategory(category);
+        packet.setVolume(volume);
+        packet.setPitch(pitch);
+        packet.setPositionX(position.getBlockX());
+        packet.setPositionY(position.getBlockY());
+        packet.setPositionZ(position.getBlockZ());
+        sendPacket(packet);
+    }
+
+    @Override
+    public void stopSound() {
+        MinecraftStopSoundPacket packet = new MinecraftStopSoundPacket();
+        packet.setAction(MinecraftStopSoundPacket.Action.ALL);
+        sendPacket(packet);
+    }
+
+    @Override
+    public void stopSound(String sound) {
+        MinecraftStopSoundPacket packet = new MinecraftStopSoundPacket();
+        packet.setSoundName(sound);
+        packet.setAction(MinecraftStopSoundPacket.Action.SOUND);
+        sendPacket(packet);
+    }
+
+    @Override
+    public void stopSound(SoundCategory category) {
+        MinecraftStopSoundPacket packet = new MinecraftStopSoundPacket();
+        packet.setCategory(category);
+        packet.setAction(MinecraftStopSoundPacket.Action.CATEGORY);
+        sendPacket(packet);
+    }
+
+    @Override
+    public void stopSound(String sound, SoundCategory category) {
+        MinecraftStopSoundPacket packet = new MinecraftStopSoundPacket();
+        packet.setCategory(category);
+        packet.setSoundName(sound);
+        packet.setAction(MinecraftStopSoundPacket.Action.BOTH);
+        sendPacket(packet);
+    }
+
+    @Override
     public void sendLocalLoopPacket(MinecraftPacket packet) {
         connection.sendLocalLoopPacket(packet);
+    }
+
+    @Override
+    public void sendRawPacket(ByteBuf byteBuf) {
+        connection.sendRawPacket(byteBuf);
     }
 
     @Override
@@ -495,7 +559,7 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
 
         channel.pipeline().addAfter("packet-encoder","mcnative-packet-rewrite-encoder"
                 ,new MinecraftProtocolRewriteEncoder(McNative.getInstance().getLocal().getPacketManager()
-                        ,Endpoint.DOWNSTREAM, PacketDirection.OUTGOING,this));
+                        ,Endpoint.DOWNSTREAM, PacketDirection.OUTGOING,this.connection));
 
          channel.pipeline().addBefore("packet-decoder","mcnative-packet-rewrite-decoder"
                 ,new MinecraftProtocolRewriteDecoder(McNative.getInstance().getLocal().getPacketManager()
@@ -521,6 +585,26 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
     @Internal
     public void setFirstJoin(boolean firstJoin) {
         this.firstJoin = firstJoin;
+    }
+
+    @Internal
+    public Map<TablistEntry, String> getTablistTeamNames() {
+        return tablistTeamNames;
+    }
+
+    @Internal
+    public int getTablistTeamIndexAndIncrement(){
+        return tablistTeamIndex++;
+    }
+
+    @Override
+    public Position getPosition() {
+        return position.clone();
+    }
+
+    @Internal
+    public Position getDirectPosition() {
+        return position;
     }
 }
 

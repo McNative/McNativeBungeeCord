@@ -66,7 +66,7 @@ public class McNativeCommand extends Command implements TabExecutor {
             if(original instanceof NoPermissionAble) {
                 noPermissionHandler = ((NoPermissionAble)original);
             } else {
-                noPermissionHandler = commandManager.getNoPermissionHandler();
+                noPermissionHandler = commandManager.getNoPermissionHandler(getOriginal().getOwner());
             }
 
             if(CommandManager.hasPermission(mappedSender, noPermissionHandler, null, original.getConfiguration().getPermission(),
