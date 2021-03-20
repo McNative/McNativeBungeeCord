@@ -24,6 +24,7 @@ public class BungeeMinecraftProtocolRewriteDecoder extends MinecraftProtocolRewr
         super(packetManager, endpoint, direction, connection);
         this.connection = connection;
         this.versionId = PositionPacketVersionId.get(connection.getProtocolVersion());
+        System.out.println("POSITIONING PROTOCOL: "+this.versionId);
     }
 
     @Override
