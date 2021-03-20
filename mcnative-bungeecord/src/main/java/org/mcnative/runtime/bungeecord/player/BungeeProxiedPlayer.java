@@ -373,7 +373,7 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
     @Override
     public void addBossBar(BossBar bossBar) {
         if(!this.bossBars.contains(bossBar)){
-            this.bossBars.remove(bossBar);
+            this.bossBars.add(bossBar);
             ((DefaultBossBar)bossBar).attachReceiver(this);
         }
     }
