@@ -82,7 +82,7 @@ public class BungeeCordPlayerManager extends AbstractPlayerManager {
     public <T> T translate(Class<T> translatedClass, MinecraftPlayer player) {
         System.out.println("---------------------------");
         for (Map.Entry<Class<?>, Function<MinecraftPlayer, ?>> entry : this.adapters.entrySet()) {
-            System.out.println(entry.getKey()+" | "+entry.getKey().equals(translatedClass));
+            System.out.println(entry.getKey()+" | "+entry.getKey().getName().equals(translatedClass.getName()));
         }
         System.out.println("---------------------------");
 
