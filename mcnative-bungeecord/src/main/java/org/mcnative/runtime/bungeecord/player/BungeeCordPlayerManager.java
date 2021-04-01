@@ -91,4 +91,5 @@ public class BungeeCordPlayerManager extends AbstractPlayerManager {
         return (T) translator.apply(player);
     }
 
+
 }
