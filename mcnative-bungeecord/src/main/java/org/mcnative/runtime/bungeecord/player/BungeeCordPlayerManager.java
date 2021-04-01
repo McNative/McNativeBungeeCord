@@ -27,8 +27,10 @@ import org.mcnative.runtime.api.player.OnlineMinecraftPlayer;
 import org.mcnative.runtime.common.player.AbstractPlayerManager;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class BungeeCordPlayerManager extends AbstractPlayerManager {
@@ -75,4 +77,18 @@ public class BungeeCordPlayerManager extends AbstractPlayerManager {
     public OnlineMinecraftPlayer unregisterPlayer(UUID uniqueId){
         return Iterators.removeOne(this.onlineMinecraftPlayers, player -> player.getUniqueId().equals(uniqueId));
     }
+
+    @Override
+    public <T> T translate(Class<T> translatedClass, MinecraftPlayer player) {
+        System.out.println("---------------------------");
+        for (Map.Entry<Class<?>, Function<MinecraftPlayer, ?>> entry : this.adapters.entrySet()) {
+            System.out.println(entry.getKey()+" | "+entry.getKey().equals(translatedClass));
+        }
+        System.out.println("---------------------------");
+
+        Function<MinecraftPlayer,?> translator = this.adapters.get(translatedClass);
+        if(translator == null) throw new IllegalArgumentException(String.format("No translator for player %s class found.",translatedClass));
+        return (T) translator.apply(player);
+    }
+
 }

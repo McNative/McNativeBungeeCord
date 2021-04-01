@@ -53,6 +53,7 @@ public class CloudNetV3PlatformListener implements Listener {
     @net.pretronic.libraries.event.Listener
     public void onMaxCount(LocalServiceMaxPlayerCountEvent event){
         if(proxyManagement == null) proxyManagement = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(AbstractSyncProxyManagement.class);
+        if(proxyManagement == null) return;
         SyncProxyMotd motd = proxyManagement.getRandomMotd();
         int maxPlayers;
         if(motd.isAutoSlot()){
