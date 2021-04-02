@@ -87,6 +87,7 @@ public class BungeeCordPlayerManager extends AbstractPlayerManager {
         }
         System.out.println("---------------------------");
 
+        
         Function<MinecraftPlayer,?> translator = this.adapters.get(translatedClass);
         if(translator == null) throw new IllegalArgumentException(String.format("No translator for player %s class found.",translatedClass));
         return (T) translator.apply(player);
