@@ -74,7 +74,6 @@ public class CloudNetV3PlatformListener implements Listener {
     public void onPlayerPostLogin(PreLoginEvent event){
 
         BridgeProxyHelper.getFallbacks().forEach(proxyFallback -> {
-            System.out.println(proxyFallback.getTask()+" => "+BridgeProxyHelper.getCachedServiceInfoSnapshots(proxyFallback.getTask()));
 
         });
 
@@ -82,6 +81,7 @@ public class CloudNetV3PlatformListener implements Listener {
                 .flatMap(proxyFallback -> BridgeProxyHelper.getCachedServiceInfoSnapshots(proxyFallback.getTask())
                         .map(serviceInfoSnapshot -> new PlayerFallback(proxyFallback.getPriority(), serviceInfoSnapshot)))
                 .anyMatch(fallback -> fallback.getTarget().getProperty(BridgeServiceProperty.IS_ONLINE).orElse(false));
+        System.out.println("Server: "+available);
         if(!available){
             ProxyServer.getInstance().getLogger().info("No servers available");
             event.setCancelled(true);
