@@ -78,20 +78,4 @@ public class BungeeCordPlayerManager extends AbstractPlayerManager {
         return Iterators.removeOne(this.onlineMinecraftPlayers, player -> player.getUniqueId().equals(uniqueId));
     }
 
-    @Override
-    public <T> T translate(Class<T> translatedClass, MinecraftPlayer player) {
-        System.out.println("---------------------------");
-        for (Map.Entry<Class<?>, Function<MinecraftPlayer, ?>> entry : this.adapters.entrySet()) {
-            if(entry.getKey().getName().equals(translatedClass.getName())) return (T) entry.getValue().apply(player);
-            System.out.println(entry.getKey()+" | "+entry.getKey().getName().equals(translatedClass.getName()));
-        }
-        System.out.println("---------------------------");
-
-        
-        Function<MinecraftPlayer,?> translator = this.adapters.get(translatedClass);
-        if(translator == null) throw new IllegalArgumentException(String.format("No translator for player %s class found.",translatedClass));
-        return (T) translator.apply(player);
-    }
-
-
 }
