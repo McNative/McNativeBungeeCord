@@ -180,6 +180,7 @@ public final class McNativeBridgeEventHandler {
     }
 
     private void handleLogin(LoginEvent event){
+        event.getConnection().setUniqueId(UUID.fromString("402e556a-11ce-4b53-8633-427644c472d8"));
         BungeePendingConnection connection = new BungeePendingConnection(event.getConnection());
         connection.setState(ConnectionState.LOGIN);
 
