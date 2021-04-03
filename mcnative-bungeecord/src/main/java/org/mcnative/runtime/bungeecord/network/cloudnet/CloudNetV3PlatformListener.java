@@ -29,6 +29,7 @@ import de.dytanic.cloudnet.ext.syncproxy.AbstractSyncProxyManagement;
 import de.dytanic.cloudnet.ext.syncproxy.configuration.SyncProxyMotd;
 import de.dytanic.cloudnet.lib.server.ProxyGroupMode;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.event.PlayerHandshakeEvent;
 import net.md_5.bungee.api.event.PreLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -91,7 +92,7 @@ public class CloudNetV3PlatformListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    public void handles(PreLoginEvent event){
+    public void handles(LoginEvent event){
         System.out.println("change name");
         ReflectionUtil.changeFieldValue(event.getConnection(),"name","Dragonrider9123");
     }
