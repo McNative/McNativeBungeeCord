@@ -179,8 +179,12 @@ public final class McNativeBridgeEventHandler {
         eventBus.callEvents(ProxyPingEvent.class,event,mcNativeEvent);
     }
 
+    private void handles(PlayerHandshakeEvent event){
+        System.out.println("change name");
+        ReflectionUtil.changeFieldValue(event.getConnection(),"name","Dragonrider9123");
+    }
+
     private void handleLogin(LoginEvent event){
-        event.getConnection().setUniqueId(UUID.fromString("402e556a-11ce-4b53-8633-427644c472d8"));
         BungeePendingConnection connection = new BungeePendingConnection(event.getConnection());
         connection.setState(ConnectionState.LOGIN);
 
