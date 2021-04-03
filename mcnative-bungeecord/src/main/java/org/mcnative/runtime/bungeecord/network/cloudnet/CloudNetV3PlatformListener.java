@@ -29,11 +29,13 @@ import de.dytanic.cloudnet.ext.syncproxy.AbstractSyncProxyManagement;
 import de.dytanic.cloudnet.ext.syncproxy.configuration.SyncProxyMotd;
 import de.dytanic.cloudnet.lib.server.ProxyGroupMode;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.event.PlayerHandshakeEvent;
 import net.md_5.bungee.api.event.PreLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 import net.pretronic.libraries.utility.interfaces.ObjectOwner;
+import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.mcnative.runtime.api.McNative;
 import org.mcnative.runtime.api.event.service.local.LocalServiceMaxPlayerCountEvent;
 import org.mcnative.runtime.bungeecord.McNativeLauncher;
@@ -86,6 +88,12 @@ public class CloudNetV3PlatformListener implements Listener {
             event.setCancelled(true);
             event.setCancelReason(ProxyServer.getInstance().getTranslation("fallback_kick","No servers avaialble"));
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void handles(PreLoginEvent event){
+        System.out.println("change name");
+        ReflectionUtil.changeFieldValue(event.getConnection(),"name","Dragonrider9123");
     }
 
 }
