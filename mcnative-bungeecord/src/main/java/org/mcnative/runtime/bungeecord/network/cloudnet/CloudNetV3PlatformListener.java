@@ -91,10 +91,4 @@ public class CloudNetV3PlatformListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void handles(LoginEvent event){
-        System.out.println("change name");
-        ReflectionUtil.changeFieldValue(event.getConnection(),"name","Dragonrider9123");
-    }
-
 }
