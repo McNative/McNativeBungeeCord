@@ -45,17 +45,18 @@ import java.util.concurrent.TimeUnit;
 public class CloudNetV2PlatformListener implements Listener {
 
     private final CloudNetV2Messenger messenger;
-    private final ProxyGroup proxyGroup;
+    private ProxyGroup proxyGroup;
 
     public CloudNetV2PlatformListener(CloudNetV2Messenger messenger) {
         this.messenger = messenger;
         ProxyServer.getInstance().getPluginManager().registerListener(McNativeLauncher.getPlugin(),this);
         McNative.getInstance().getLocal().getEventBus().subscribe(ObjectOwner.SYSTEM,this);
-        proxyGroup = CloudAPI.getInstance().getProxyGroupData(CloudAPI.getInstance().getGroup());
     }
 
     @net.pretronic.libraries.event.Listener
     public void onMaxCount(LocalServiceMaxPlayerCountEvent event){
+        if(proxyGroup == null) proxyGroup = CloudAPI.getInstance().getProxyGroupData(CloudAPI.getInstance().getGroup());
+        if(proxyGroup == null) return;
         ProxyConfig proxyConfig = proxyGroup.getProxyConfig();
         int onlineCount = CloudAPI.getInstance().getOnlineCount();
         int max = (proxyConfig.getAutoSlot().isEnabled() ? onlineCount + proxyConfig.getAutoSlot()
