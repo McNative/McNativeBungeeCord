@@ -247,7 +247,9 @@ public class BungeePendingConnection implements PendingConnection {
 
     private GameProfile extractGameProfile(){
         Object loginResult = ReflectionUtil.getFieldValue(original,"loginProfile");
+        if(loginResult == null) return getDefaultProfile();
         Object originalProperties = ReflectionUtil.getFieldValue(loginResult,"properties");
+        if(originalProperties == null) return getDefaultProfile();
         GameProfile.Property[] properties = new GameProfile.Property[Array.getLength(originalProperties)];
         if(properties.length > 0){
             for (int i = 0; i < properties.length; i++) {
@@ -259,5 +261,9 @@ public class BungeePendingConnection implements PendingConnection {
             }
         }
         return new GameProfile(original.getUniqueId(),original.getName(),properties);
+    }
+
+    private GameProfile getDefaultProfile(){
+        return new GameProfile(original.getUniqueId(),original.getName(),new GameProfile.Property[0]);
     }
 }
