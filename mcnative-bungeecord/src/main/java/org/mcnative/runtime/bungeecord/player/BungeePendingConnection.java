@@ -267,4 +267,5 @@ public class BungeePendingConnection implements PendingConnection {
         return new GameProfile(original.getUniqueId(),original.getName(),new GameProfile.Property[0]);
     }
 
+
 }
