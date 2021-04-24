@@ -77,7 +77,7 @@ public class WrappedBungeeMinecraftServer implements MinecraftServer, VariableOb
 
     @Override
     public String getGroup() {
-        return null;
+        return getIdentifier().getGroup();
     }
 
     @Override

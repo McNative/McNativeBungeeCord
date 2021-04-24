@@ -270,7 +270,7 @@ public class BungeeCordService implements LocalService, ProxyServer, ProxyServic
 
     @Override
     public String getGroup() {
-        return null;
+        return getIdentifier().getGroup();
     }
 
     @Override

@@ -207,7 +207,7 @@ public class BungeecordProxyNetwork implements Network {
 
     @Override
     public String getGroup() {
-        return null;
+        return getIdentifier().getGroup();
     }
 
     @Override
