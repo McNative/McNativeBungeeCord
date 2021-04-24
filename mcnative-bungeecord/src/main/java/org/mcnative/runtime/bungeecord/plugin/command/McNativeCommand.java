@@ -81,10 +81,10 @@ public class McNativeCommand extends Command implements TabExecutor {
         return true;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
-        if(original instanceof Completable){
+        boolean hasPermission = original.getConfiguration().getPermission() == null || sender.hasPermission(original.getConfiguration().getPermission());
+        if(hasPermission && original instanceof Completable){
             Collection<String> result = ((Completable) original).complete(getMappedSender(sender),args);
             if(result != null){
                 if(result instanceof List) return result;
