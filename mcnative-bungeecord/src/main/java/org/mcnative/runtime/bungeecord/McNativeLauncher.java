@@ -141,7 +141,6 @@ public class McNativeLauncher {
                 ,serverMap);
 
         MinecraftJavaProtocol.register(localService.getPacketManager());
-       // MinecraftBossBarPacketCodec.register(localService.getPacketManager());
 
         McNativeConsoleCredentials credentials = setupCredentials(variables);
         BungeeCordMcNative instance = new BungeeCordMcNative(apiVersion,implementationVersion,pluginManager
@@ -189,7 +188,8 @@ public class McNativeLauncher {
 
     private static boolean isWaterfallBase(){
         return ProxyServer.getInstance().getVersion().toLowerCase().contains("waterfall")
-                || ProxyServer.getInstance().getVersion().toLowerCase().contains("travertine");
+                || ProxyServer.getInstance().getVersion().toLowerCase().contains("travertine")
+                || ProxyServer.getInstance().getName().equalsIgnoreCase("FlameCord");
     }
 
     private static McNativeConsoleCredentials setupCredentials(Collection<Env> variables){

@@ -81,7 +81,6 @@ public class McNativeCommand extends Command implements TabExecutor {
         return true;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
         boolean hasPermission = original.getConfiguration().getPermission() == null || sender.hasPermission(original.getConfiguration().getPermission());
