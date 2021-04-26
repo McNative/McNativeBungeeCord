@@ -29,6 +29,7 @@ import net.pretronic.libraries.message.bml.variable.describer.VariableObjectToSt
 import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.Validate;
 import net.pretronic.libraries.utility.annonations.Internal;
+import net.pretronic.libraries.utility.exception.OperationFailedException;
 import org.mcnative.runtime.api.McNative;
 import org.mcnative.runtime.api.network.NetworkIdentifier;
 import org.mcnative.runtime.api.network.component.server.MinecraftServer;
@@ -51,16 +52,15 @@ import java.util.concurrent.CompletableFuture;
 public class WrappedBungeeMinecraftServer implements MinecraftServer, VariableObjectToString {
 
     private final ServerInfo original;
-    private final NetworkIdentifier identifier;
 
     private String permission;
     private MinecraftServerType type;
 
     private final Collection<OnlineMinecraftPlayer> players;
+    private NetworkIdentifier identifier;
 
     public WrappedBungeeMinecraftServer(ServerInfo info) {
         this.original = info;
-        this.identifier = McNative.getInstance().getNetwork().getIdentifier(info.getName());
         this.permission = info.isRestricted() ? info.getPermission() : null;
         this.type = MinecraftServerType.NORMAL;
         this.players = new ArrayList<>();
@@ -212,6 +212,8 @@ public class WrappedBungeeMinecraftServer implements MinecraftServer, VariableOb
 
     @Override
     public NetworkIdentifier getIdentifier() {
+        if(this.identifier == null) this.identifier = McNative.getInstance().getNetwork().getIdentifier(original.getName());
+        if(this.identifier == null) throw new OperationFailedException("Server not registered in network technology");
         return identifier;
     }
 
@@ -252,4 +254,6 @@ public class WrappedBungeeMinecraftServer implements MinecraftServer, VariableOb
     public void removePlayer(OnlineMinecraftPlayer player){
         this.players.remove(player);
     }
+
+
 }
