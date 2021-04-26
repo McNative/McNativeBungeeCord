@@ -254,4 +254,5 @@ public class WrappedBungeeMinecraftServer implements MinecraftServer, VariableOb
     public void removePlayer(OnlineMinecraftPlayer player){
         this.players.remove(player);
     }
+
 }
