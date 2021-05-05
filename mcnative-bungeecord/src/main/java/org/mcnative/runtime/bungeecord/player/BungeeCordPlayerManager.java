@@ -24,6 +24,7 @@ import net.pretronic.libraries.utility.annonations.Internal;
 import org.mcnative.runtime.api.player.ConnectedMinecraftPlayer;
 import org.mcnative.runtime.api.player.MinecraftPlayer;
 import org.mcnative.runtime.api.player.OnlineMinecraftPlayer;
+import org.mcnative.runtime.common.McNativeMappingException;
 import org.mcnative.runtime.common.player.AbstractPlayerManager;
 
 import java.util.Collection;
@@ -63,7 +64,7 @@ public class BungeeCordPlayerManager extends AbstractPlayerManager {
     @Internal
     public ConnectedMinecraftPlayer getMappedPlayer(net.md_5.bungee.api.connection.ProxiedPlayer player0){
         ConnectedMinecraftPlayer result = Iterators.findOne(this.onlineMinecraftPlayers, player -> player.getUniqueId() == player0.getUniqueId());
-        if(result == null) throw new IllegalArgumentException("McNative mapping error (BungeeCord -> McNative)");
+        if(result == null) throw new McNativeMappingException("Plugin "+player0.getName()+" is not registered on McNative side");
         return result;
     }
 

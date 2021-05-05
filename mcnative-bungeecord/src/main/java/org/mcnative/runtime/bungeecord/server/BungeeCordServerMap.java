@@ -33,6 +33,7 @@ import org.mcnative.runtime.api.McNative;
 import org.mcnative.runtime.api.network.component.server.MinecraftServer;
 import org.mcnative.runtime.api.network.component.server.MinecraftServerType;
 import org.mcnative.runtime.bungeecord.McNativeLauncher;
+import org.mcnative.runtime.common.McNativeMappingException;
 
 import java.net.InetSocketAddress;
 import java.util.*;
@@ -112,7 +113,7 @@ public class BungeeCordServerMap implements TMap<String, ServerInfo> {
         tryCheckInject();
         if(info instanceof MinecraftServer) return (MinecraftServer) info;
         ServerEntry result = Iterators.findOne(this.servers, entry -> entry.bungeeCord.getName().equalsIgnoreCase(info.getName()));
-        if(result == null) throw new IllegalArgumentException("McNative mapping error (BungeeCord -> McNative)");
+        if(result == null) throw new McNativeMappingException("Server "+info.getName()+" is not registered on McNative side");
         return result.mcNative;
     }
 
@@ -121,7 +122,7 @@ public class BungeeCordServerMap implements TMap<String, ServerInfo> {
         tryCheckInject();
         if(server instanceof ServerInfo) return (ServerInfo) server;
         ServerEntry result = Iterators.findOne(this.servers, entry -> entry.mcNative.equals(server));
-        if(result == null) throw new IllegalArgumentException("The targeted server is not registered as a server (McNative -> BungeeCord).");
+        if(result == null) throw new McNativeMappingException("Server "+server.getName()+" is not registered on BungeeCord side");
         return result.bungeeCord;
     }
 
