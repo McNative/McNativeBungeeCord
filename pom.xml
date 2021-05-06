@@ -219,5 +219,6 @@
             <version>${dependency.cloudnet.v3}</version>
             <scope>provided</scope>
         </dependency>
+
     </dependencies>
 </project>
