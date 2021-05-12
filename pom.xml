@@ -51,7 +51,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Dependency version -->
-        <dependency.mcnative.api>1.4.0.97-SNAPSHOT</dependency.mcnative.api>
+        <dependency.mcnative.api>1.4.1.99-SNAPSHOT</dependency.mcnative.api>
         <dependency.mcnative.common>1.13.2.111-SNAPSHOT</dependency.mcnative.common>
         <dependency.netty>4.1.56.Final</dependency.netty>
 
@@ -218,13 +218,6 @@
             <artifactId>cloudnet-bridge</artifactId>
             <version>${dependency.cloudnet.v3}</version>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.28.0-GA</version>
-            <scope>compile</scope>
         </dependency>
 
     </dependencies>
