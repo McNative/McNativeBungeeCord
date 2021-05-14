@@ -532,6 +532,10 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
         }
     }
 
+    public void setOriginal(net.md_5.bungee.api.connection.ProxiedPlayer original){
+        this.original = original;
+    }
+
     @Internal
     public void setSettings(PlayerClientSettings settings){
         this.settings = settings;

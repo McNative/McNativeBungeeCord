@@ -350,9 +350,10 @@ public final class McNativeBridgeEventHandler {
         PermissionHandler handler = null;
         CommandSender sender;
         if(event.getSender() instanceof ProxiedPlayer){
-            OnlineMinecraftPlayer player = this.initializingPlayer.get(((ProxiedPlayer) event.getSender()).getUniqueId());
+            BungeeProxiedPlayer player = this.initializingPlayer.get(((ProxiedPlayer) event.getSender()).getUniqueId());
             if(player == null) player = this.pendingPlayers.get(((ProxiedPlayer) event.getSender()).getUniqueId());
-            if(player == null) player = playerManager.getMappedPlayer((ProxiedPlayer) event.getSender());
+            if(player == null) player = (BungeeProxiedPlayer) playerManager.getMappedPlayer((ProxiedPlayer) event.getSender());
+            if(player.getOriginal() == null) player.setOriginal((ProxiedPlayer) event.getSender());
             sender = player;
             handler = player.getPermissionHandler();
         }else if(event.getSender().equals(ProxyServer.getInstance().getConsole())){
