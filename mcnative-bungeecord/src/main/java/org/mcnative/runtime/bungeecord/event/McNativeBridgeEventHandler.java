@@ -406,5 +406,4 @@ public final class McNativeBridgeEventHandler {
         }
     }
 
-
 }
