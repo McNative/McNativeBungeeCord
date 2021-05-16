@@ -19,26 +19,26 @@
 
 package org.mcnative.runtime.bungeecord.player.permission;
 
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.pretronic.libraries.document.Document;
 import net.pretronic.libraries.document.type.DocumentFileType;
-import org.mcnative.runtime.bungeecord.McNativeBungeeCordConfiguration;
 import org.mcnative.runtime.api.player.PlayerDesign;
+import org.mcnative.runtime.bungeecord.McNativeBungeeCordConfiguration;
+import org.mcnative.runtime.bungeecord.player.BungeeProxiedPlayer;
 
 import java.util.Map;
 
 public class BungeeCordPlayerDesign implements PlayerDesign {
 
-    private final ProxiedPlayer player;
+    private final BungeeProxiedPlayer player;
 
-    public BungeeCordPlayerDesign(ProxiedPlayer player) {
+    public BungeeCordPlayerDesign(BungeeProxiedPlayer player) {
         this.player = player;
     }
 
     @Override
     public String getColor() {
         for (Map.Entry<String, String> entry : McNativeBungeeCordConfiguration.PLAYER_COLORS_COLORS.entrySet()) {
-            if(player.hasPermission(entry.getKey())){
+            if(player.getOriginal().hasPermission(entry.getKey())){
                 return entry.getValue();
             }
         }

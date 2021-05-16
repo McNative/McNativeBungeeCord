@@ -85,6 +85,7 @@ public final class McNativeBridgeEventHandler {
     private final BungeeCordPlayerManager playerManager;
     private final BungeeCordServerMap serverMap;
     private final EventBus eventBus;
+    private final Map<UUID, BungeeProxiedPlayer> initializingPlayer;
     private final Map<UUID, BungeeProxiedPlayer> pendingPlayers;
     private final Map<Connection,String> tabCompleteCursors;
 
@@ -94,6 +95,7 @@ public final class McNativeBridgeEventHandler {
         this.playerManager = playerManager;
         this.serverMap = serverMap;
 
+        this.initializingPlayer = new ConcurrentHashMap<>();
         this.pendingPlayers = new ConcurrentHashMap<>();
         this.tabCompleteCursors = new ConcurrentHashMap<>();
 
@@ -192,10 +194,12 @@ public final class McNativeBridgeEventHandler {
                     ,connection.getGameProfile());
         }else data.updateLoginInformation(connection.getName(),connection.getGameProfile(),System.currentTimeMillis());
         BungeeProxiedPlayer player = new BungeeProxiedPlayer(serverMap,connection,data);
+        this.initializingPlayer.put(player.getUniqueId(),player);
 
         MinecraftPlayerLoginEvent loginEvent = new BungeeMinecraftLoginEvent(event,connection,player);
         eventBus.callEvents(LoginEvent.class,event,loginEvent);
 
+        this.initializingPlayer.remove(player.getUniqueId());
         if(loginEvent.isCancelled()){
             if(Arrays.equals(event.getCancelReasonComponents(), BungeeMinecraftLoginEvent.MCNATIVE_MANAGER)){
                 connection.disconnect(loginEvent.getCancelReason(),loginEvent.getCancelReasonVariables());
@@ -346,7 +350,10 @@ public final class McNativeBridgeEventHandler {
         PermissionHandler handler = null;
         CommandSender sender;
         if(event.getSender() instanceof ProxiedPlayer){
-            OnlineMinecraftPlayer player = playerManager.getMappedPlayer((ProxiedPlayer) event.getSender());
+            BungeeProxiedPlayer player = this.initializingPlayer.get(((ProxiedPlayer) event.getSender()).getUniqueId());
+            if(player == null) player = this.pendingPlayers.get(((ProxiedPlayer) event.getSender()).getUniqueId());
+            if(player == null) player = (BungeeProxiedPlayer) playerManager.getMappedPlayer((ProxiedPlayer) event.getSender());
+            if(player.getOriginal() == null) player.setOriginal((ProxiedPlayer) event.getSender());
             sender = player;
             handler = player.getPermissionHandler();
         }else if(event.getSender().equals(ProxyServer.getInstance().getConsole())){
@@ -398,6 +405,5 @@ public final class McNativeBridgeEventHandler {
             return PlayerClientSettings.SkinParts.SKIN_SHOW_ALL;
         }
     }
-
 
 }

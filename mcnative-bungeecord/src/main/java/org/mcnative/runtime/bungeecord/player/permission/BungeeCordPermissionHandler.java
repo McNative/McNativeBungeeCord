@@ -34,8 +34,7 @@ public class BungeeCordPermissionHandler implements PermissionHandler {
 
     public BungeeCordPermissionHandler(BungeeProxiedPlayer player) {
         this.player = player;
-        this.design = new BungeeCordPlayerDesign(player.getOriginal());
-        player.setDesign(design);
+        this.design = new BungeeCordPlayerDesign(player);
     }
 
     @Override
@@ -137,4 +136,8 @@ public class BungeeCordPermissionHandler implements PermissionHandler {
         throw new UnsupportedOperationException("BungeeCord does not support operators");
     }
 
+    @Override
+    public void onHandlerInitialized() {
+        player.setDesign(design);
+    }
 }
