@@ -36,7 +36,7 @@ public class BungeeCordDependencyLoader implements DependencyClassLoader {
             if(constructor.getParameterCount() == 4){
                 loader = (URLClassLoader) constructor.newInstance(ProxyServer.getInstance(), description, new File(url.toURI()),ProxyServer.class.getClassLoader());
             }else {
-                loader = (URLClassLoader) constructor.newInstance(ProxyServer.getInstance(), description, url);
+                loader = (URLClassLoader) constructor.newInstance(ProxyServer.getInstance(), description, new URL[]{url});
                 //Change parent class loader to root loader
                 ReflectionUtil.changeFieldValue(ClassLoader.class,loader,"parent",ProxyServer.class.getClassLoader());
             }
