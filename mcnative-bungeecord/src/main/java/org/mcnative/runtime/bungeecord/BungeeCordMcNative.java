@@ -25,6 +25,7 @@ import net.pretronic.libraries.command.sender.CommandSender;
 import net.pretronic.libraries.concurrent.TaskScheduler;
 import net.pretronic.libraries.concurrent.simple.SimpleTaskScheduler;
 import net.pretronic.libraries.dependency.DependencyManager;
+import net.pretronic.libraries.dependency.loader.LegacyReflectedDependencyClassLoader;
 import net.pretronic.libraries.event.EventPriority;
 import net.pretronic.libraries.logging.Debug;
 import net.pretronic.libraries.logging.PretronicLogger;
@@ -129,7 +130,8 @@ public class BungeeCordMcNative implements McNative {
         this.scheduler = new SimpleTaskScheduler();
         this.consoleSender = new McNativeCommand.MappedCommandSender(ProxyServer.getInstance().getConsole());
         this.dependencyManager = new DependencyManager(logger,new File("plugins/McNative/lib/dependencies"));
-        this.dependencyManager.setDefaultLoader(new BungeeCordDependencyLoader());
+        this.dependencyManager.setDefaultLoader(new LegacyReflectedDependencyClassLoader());
+        //this.dependencyManager.setDefaultLoader(new BungeeCordDependencyLoader());
 
         this.factory = new DefaultObjectFactory();
         this.variables = variables;
