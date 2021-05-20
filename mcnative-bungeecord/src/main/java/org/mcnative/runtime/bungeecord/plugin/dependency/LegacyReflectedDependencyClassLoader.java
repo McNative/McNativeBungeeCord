@@ -20,7 +20,6 @@
 
 package org.mcnative.runtime.bungeecord.plugin.dependency;
 
-import net.md_5.bungee.api.ProxyServer;
 import net.pretronic.libraries.dependency.loader.DependencyClassLoader;
 import net.pretronic.libraries.utility.reflect.ReflectException;
 
@@ -45,7 +44,7 @@ public class LegacyReflectedDependencyClassLoader implements DependencyClassLoad
     @Override
     public ClassLoader load(ClassLoader parent, URL location) {
         try {
-            if(parent == null) parent = ProxyServer.class.getClassLoader();
+            if(parent == null) parent = getClass().getClassLoader();
             METHOD_ADD_URL.invoke(parent, location);
             return parent;
         } catch (IllegalAccessException | InvocationTargetException exception) {
