@@ -27,6 +27,7 @@ import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.pretronic.libraries.concurrent.Task;
 import net.pretronic.libraries.message.bml.variable.VariableSet;
 import net.pretronic.libraries.utility.annonations.Internal;
+import net.pretronic.libraries.utility.exception.OperationFailedException;
 import net.pretronic.libraries.utility.interfaces.ObjectOwner;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.mcnative.runtime.api.connection.MinecraftOutputStream;
@@ -95,6 +96,7 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
 
     private net.md_5.bungee.api.connection.ProxiedPlayer original;
 
+    private CustomClient customClient;
     private MinecraftServer server;
     private PlayerClientSettings settings;
 
@@ -240,32 +242,34 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
 
     @Override
     public CustomClient getCustomClient() {
-        return null;
+        return customClient;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends CustomClient> T getCustomClient(Class<T> aClass) {
-        return null;
+        return (T) customClient;
     }
 
     @Override
     public boolean isCustomClient() {
-        return false;
+        return customClient != null;
     }
 
     @Override
-    public boolean isCustomClient(String s) {
-        return false;
+    public boolean isCustomClient(String name) {
+        return customClient != null && customClient.getName().equalsIgnoreCase(name);
     }
 
     @Override
     public boolean isCustomClient(Class<? extends CustomClient> aClass) {
-        return false;
+        return customClient != null && customClient.getClass().equals(aClass);
     }
 
     @Override
     public void setCustomClient(CustomClient customClient) {
-
+        if(this.customClient != null) throw new OperationFailedException("A custom client is already registered for this player");
+        this.customClient = customClient;
     }
 
     @Override
