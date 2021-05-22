@@ -73,6 +73,7 @@ import org.mcnative.runtime.api.player.chat.GroupChatFormatter;
 import org.mcnative.runtime.api.proxy.ProxyService;
 import org.mcnative.runtime.bungeecord.shared.McNativeBridgedEventBus;
 import org.mcnative.runtime.bungeecord.waterfall.McNativeWaterfallEventBus;
+import org.mcnative.runtime.client.integrations.ClientIntegration;
 import org.mcnative.runtime.common.event.service.local.DefaultLocalServiceShutdownEvent;
 import org.mcnative.runtime.common.maf.MAFService;
 import org.mcnative.runtime.common.network.event.NetworkEventHandler;
@@ -141,6 +142,7 @@ public class McNativeLauncher {
                 ,serverMap);
 
         MinecraftJavaProtocol.register(localService.getPacketManager());
+        ClientIntegration.register();
 
         McNativeConsoleCredentials credentials = setupCredentials(variables);
         BungeeCordMcNative instance = new BungeeCordMcNative(apiVersion,implementationVersion,pluginManager

@@ -27,8 +27,10 @@ import net.pretronic.libraries.event.EventBus;
 import net.pretronic.libraries.message.bml.variable.VariableSet;
 import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.Validate;
+import net.pretronic.libraries.utility.interfaces.ObjectOwner;
 import org.mcnative.runtime.api.ServerPerformance;
 import org.mcnative.runtime.api.event.service.local.LocalServiceMaxPlayerCountEvent;
+import org.mcnative.runtime.api.player.client.CustomPluginMessageListener;
 import org.mcnative.runtime.bungeecord.player.BungeeCordPlayerManager;
 import org.mcnative.runtime.bungeecord.server.BungeeCordServerMap;
 import org.mcnative.runtime.api.LocalService;
@@ -51,6 +53,7 @@ import org.mcnative.runtime.common.event.service.local.DefaultLocalServiceMaxPla
 import java.net.InetSocketAddress;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 
 public class BungeeCordService implements LocalService, ProxyServer, ProxyService {
 
@@ -64,6 +67,8 @@ public class BungeeCordService implements LocalService, ProxyServer, ProxyServic
     private Tablist defaultTablist;
     private ServerStatusResponse statusResponse;
     private final ServerPerformance serverPerformance;
+    private final Collection<BungeeCustomPluginMessage> pluginMessageListeners;
+
 
     public BungeeCordService(PacketManager packetManager, CommandManager commandManager,BungeeCordPlayerManager playerManager
             ,EventBus eventBus,BungeeCordServerMap serverMap) {
@@ -73,6 +78,7 @@ public class BungeeCordService implements LocalService, ProxyServer, ProxyServic
         this.eventBus = eventBus;
         this.serverMap = serverMap;
         this.serverPerformance = new BungeecordServerPerformance();
+        this.pluginMessageListeners = new ArrayList<>();
     }
 
     @Override
@@ -299,5 +305,18 @@ public class BungeeCordService implements LocalService, ProxyServer, ProxyServic
     @Override
     public CompletableFuture<Document> sendQueryMessageAsync(String channel, Document request) {
         return McNative.getInstance().getRegistry().getService(Messenger.class).sendQueryMessageAsync(this,channel,request);
+    }
+
+    @Override
+    public void registerCustomPluginMessageListener(ObjectOwner owner, String channel, CustomPluginMessageListener listener) {
+        BungeeCustomPluginMessage message = new BungeeCustomPluginMessage(owner,channel,listener);
+        this.pluginMessageListeners.add(message);
+        net.md_5.bungee.api.ProxyServer.getInstance().registerChannel(channel);
+        net.md_5.bungee.api.ProxyServer.getInstance().getPluginManager().registerListener(McNativeLauncher.getPlugin(),message);
+    }
+
+    @Override
+    public void unregisterCustomPluginMessageListener(CustomPluginMessageListener listener) {
+        Iterators.removeOne(this.pluginMessageListeners, message -> message.getListener().equals(listener));
     }
 }

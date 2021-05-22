@@ -51,8 +51,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Dependency version -->
-        <dependency.mcnative.api>1.4.24.128-SNAPSHOT</dependency.mcnative.api>
-        <dependency.mcnative.common>1.13.10.120-SNAPSHOT</dependency.mcnative.common>
+        <dependency.mcnative.api>1.4.29.133-SNAPSHOT</dependency.mcnative.api>
+        <dependency.mcnative.common>1.13.11.122-SNAPSHOT</dependency.mcnative.common>
         <dependency.netty>4.1.56.Final</dependency.netty>
 
         <dependency.bungeecord>1.16-R0.4-SNAPSHOT</dependency.bungeecord>
