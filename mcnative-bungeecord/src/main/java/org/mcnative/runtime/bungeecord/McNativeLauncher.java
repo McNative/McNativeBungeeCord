@@ -141,15 +141,15 @@ public class McNativeLauncher {
                 ,new DefaultEventBus(new NetworkEventHandler())
                 ,serverMap);
 
-        MinecraftJavaProtocol.register(localService.getPacketManager());
-        ClientIntegration.register();
-
         McNativeConsoleCredentials credentials = setupCredentials(variables);
         BungeeCordMcNative instance = new BungeeCordMcNative(apiVersion,implementationVersion,pluginManager
                 ,playerManager, localService,variables,credentials);
 
         McNative.setInstance(instance);
         instance.setNetwork(setupNetwork(logger,localService,instance.getExecutorService(),serverMap));
+
+        MinecraftJavaProtocol.register(localService.getPacketManager());
+        ClientIntegration.register();
 
         instance.getNetwork().getMessenger().registerChannel("mcnative_player",ObjectOwner.SYSTEM,new McNativePlayerActionListener());
         instance.getNetwork().getMessenger().registerChannel("mcnative_global",ObjectOwner.SYSTEM,new McNativeGlobalActionListener());
