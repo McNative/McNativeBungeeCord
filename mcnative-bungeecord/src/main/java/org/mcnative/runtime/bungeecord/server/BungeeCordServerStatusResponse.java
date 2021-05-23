@@ -188,8 +188,11 @@ public class BungeeCordServerStatusResponse implements ServerStatusResponse {
     @Override
     public ServerStatusResponse addPlayerInfo(PlayerInfo info) {
         ServerPing.PlayerInfo[] current = ping.getPlayers().getSample();
+        if(current == null) current = new ServerPing.PlayerInfo[0];
+
         ServerPing.PlayerInfo[] updated = new ServerPing.PlayerInfo[current.length+1];
-        System.arraycopy(current, 0, updated, 0, current.length+1);
+        System.arraycopy(current, 0, updated, 0, current.length);
+
         updated[current.length] = map(info);
         ping.getPlayers().setSample(updated);
         return this;
