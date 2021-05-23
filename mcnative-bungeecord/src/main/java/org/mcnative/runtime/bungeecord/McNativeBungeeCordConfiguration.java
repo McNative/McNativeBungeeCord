@@ -92,6 +92,13 @@ public class McNativeBungeeCordConfiguration {
     @DocumentKey("network.messaging.packetManipulation.downstream")
     public static boolean NETWORK_PACKET_MANIPULATION_DOWNSTREAM_ENABLED = false;
 
+    public static boolean LABYMOD_WATERMARK_ENABLED = false;
+    public static boolean LABYMOD_VOICECHAT_ENABLED = true;
+    public static boolean LABYMOD_BANNER_ENABLED = false;
+    public static String LABYMOD_BANNER_URL = "https://content.pretronic.net/products/mcnative/banner.png";
+    public static boolean LABYMOD_ALERT_ENABLED = false;
+    public static String LABYMOD_ALERT_GAMEMODE = "McNative powered server";
+
     static{
         PLAYER_COLORS_COLORS.put("mcnative.player.color.administrator","&4");
         PLAYER_COLORS_COLORS.put("mcnative.player.color.moderator","&c");

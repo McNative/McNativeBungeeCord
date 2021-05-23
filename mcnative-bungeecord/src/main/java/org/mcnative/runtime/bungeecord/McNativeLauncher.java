@@ -240,6 +240,8 @@ public class McNativeLauncher {
     }
 
     private static void setupConfiguredServices() {
+        McNative.getInstance().getLocal().getEventBus().subscribe(ObjectOwner.SYSTEM,new LabyModListener());
+
         if (McNativeBungeeCordConfiguration.PLAYER_GLOBAL_CHAT_ENABLED) {
             ChatChannel serverChat = ChatChannel.newChatChannel();
             serverChat.setName("ServerChat");
