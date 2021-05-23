@@ -5,7 +5,7 @@
     <parent>
         <artifactId>McNativeBungeeCord</artifactId>
         <groupId>org.mcnative.runtime.bungeecord</groupId>
-        <version>1.26.0.245-SNAPSHOT</version>
+        <version>1.25.1.252</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -57,6 +57,13 @@
         <dependency>
             <groupId>org.mcnative.runtime</groupId>
             <artifactId>mcnative-runtime-network-integrations</artifactId>
+            <version>${dependency.mcnative.common}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mcnative.runtime</groupId>
+            <artifactId>mcnative-runtime-client-integrations</artifactId>
             <version>${dependency.mcnative.common}</version>
             <scope>compile</scope>
         </dependency>

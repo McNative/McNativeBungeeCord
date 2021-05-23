@@ -25,7 +25,7 @@
 
     <groupId>org.mcnative.runtime.bungeecord</groupId>
     <artifactId>McNativeBungeeCord</artifactId>
-    <version>1.26.0.245-SNAPSHOT</version>
+    <version>1.25.1.252</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -51,8 +51,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Dependency version -->
-        <dependency.mcnative.api>1.4.39.143-SNAPSHOT</dependency.mcnative.api>
-        <dependency.mcnative.common>1.13.10.120-SNAPSHOT</dependency.mcnative.common>
+        <dependency.mcnative.api>1.4.38.142-SNAPSHOT</dependency.mcnative.api>
+        <dependency.mcnative.common>1.13.12.123-SNAPSHOT</dependency.mcnative.common>
         <dependency.netty>4.1.56.Final</dependency.netty>
 
         <dependency.bungeecord>1.16-R0.4-SNAPSHOT</dependency.bungeecord>

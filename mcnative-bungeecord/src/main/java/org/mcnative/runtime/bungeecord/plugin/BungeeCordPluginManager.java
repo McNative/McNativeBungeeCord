@@ -37,6 +37,7 @@ import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.mcnative.runtime.api.McNative;
 import org.mcnative.runtime.api.event.service.registry.ServiceRegisterRegistryEvent;
 import org.mcnative.runtime.api.event.service.registry.ServiceUnregisterRegistryEvent;
+import org.mcnative.runtime.common.McNativeMappingException;
 import org.mcnative.runtime.common.event.service.registry.DefaultServiceRegisterRegistryEvent;
 import org.mcnative.runtime.common.event.service.registry.DefaultServiceUnregisterRegistryEvent;
 import org.mcnative.runtime.common.serviceprovider.message.ResourceMessageExtractor;
@@ -249,14 +250,14 @@ public class BungeeCordPluginManager implements PluginManager {
         for (net.md_5.bungee.api.plugin.Plugin plugin : this.original.getPlugins()){
             if(plugin.equals(original)) return plugin;
         }
-        throw new IllegalArgumentException("McNative Mapping error (plugin / mcnative -> bungee)");
+        throw new McNativeMappingException("Plugin "+original.getName()+" is not registered on BungeeCord side");
     }
 
     @Internal
     public Plugin<?> getMappedPlugin(net.md_5.bungee.api.plugin.Plugin original){
         Validate.notNull(original);
         for (Plugin<?> plugin : plugins) if(plugin.equals(original)) return plugin;
-        throw new IllegalArgumentException("McNative Mapping error (plugin / bungee -> mcnative)");
+        throw new McNativeMappingException("Plugin "+original.getDescription().getName()+" is not registered on McNative side");
     }
 
     @Internal

@@ -31,6 +31,7 @@ import net.pretronic.libraries.command.sender.CommandSender;
 import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.Validate;
 import net.pretronic.libraries.utility.annonations.Internal;
+import net.pretronic.libraries.utility.interfaces.InjectorAdapterAble;
 import net.pretronic.libraries.utility.interfaces.ObjectOwner;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.mcnative.runtime.bungeecord.player.BungeeProxiedPlayer;
@@ -123,6 +124,7 @@ public class BungeeCordCommandManager implements CommandManager {
 
         this.original.registerCommand(plugin,new McNativeCommand(this, command));
         this.commands.add(command);
+        if(command instanceof InjectorAdapterAble) ((InjectorAdapterAble) command).setInjector(McNative.getInstance().getInjector());
     }
 
     @Override
