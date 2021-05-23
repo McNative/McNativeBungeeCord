@@ -25,7 +25,12 @@ import net.pretronic.libraries.command.sender.CommandSender;
 import net.pretronic.libraries.concurrent.TaskScheduler;
 import net.pretronic.libraries.concurrent.simple.SimpleTaskScheduler;
 import net.pretronic.libraries.dependency.DependencyManager;
+import net.pretronic.libraries.document.DocumentFactory;
+import net.pretronic.libraries.document.DocumentRegistry;
+import net.pretronic.libraries.document.injection.DependencyInjectionObjectInstanceFactory;
 import net.pretronic.libraries.event.EventPriority;
+import net.pretronic.libraries.event.injection.DefaultInjectorService;
+import net.pretronic.libraries.event.injection.InjectorService;
 import net.pretronic.libraries.logging.Debug;
 import net.pretronic.libraries.logging.PretronicLogger;
 import net.pretronic.libraries.logging.bridge.JdkPretronicLogger;
@@ -40,11 +45,13 @@ import net.pretronic.libraries.plugin.description.PluginDescription;
 import net.pretronic.libraries.plugin.description.PluginVersion;
 import net.pretronic.libraries.plugin.loader.DefaultPluginLoader;
 import net.pretronic.libraries.plugin.manager.PluginManager;
+import net.pretronic.libraries.plugin.service.ServiceClassRegistry;
 import net.pretronic.libraries.plugin.service.ServiceRegistry;
 import net.pretronic.libraries.utility.GeneralUtil;
 import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.Validate;
 import org.mcnative.runtime.api.loader.LoaderConfiguration;
+import org.mcnative.runtime.api.network.messaging.Messenger;
 import org.mcnative.runtime.api.player.bossbar.BossBar;
 import org.mcnative.runtime.api.player.chat.ChatChannel;
 import org.mcnative.runtime.api.player.profile.GameProfileLoader;
@@ -84,8 +91,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
 public class BungeeCordMcNative implements McNative {
@@ -104,6 +113,7 @@ public class BungeeCordMcNative implements McNative {
     private final DependencyManager dependencyManager;
     private final PlayerManager playerManager;
     private final LocalService local;
+    private final InjectorService injector;
     private final McNativeConsoleCredentials consoleCredentials;
 
     private Network network;
@@ -140,9 +150,13 @@ public class BungeeCordMcNative implements McNative {
         this.pluginManager = pluginManager;
         this.playerManager = playerManager;
         this.local = local;
+        this.injector = new DefaultInjectorService(new ServiceClassRegistry(pluginManager));
 
         this.loaderConfiguration = DefaultLoaderConfiguration.load(new File("plugins/McNative/update.yml"));
         SLF4JStaticBridge.trySetLogger(logger);
+
+        DocumentRegistry.setInstanceFactory(new DependencyInjectionObjectInstanceFactory(injector));
+        //DefaultEventBus
     }
 
     @Override
@@ -240,6 +254,11 @@ public class BungeeCordMcNative implements McNative {
     }
 
     @Override
+    public InjectorService getInjector() {
+        return injector;
+    }
+
+    @Override
     public boolean isNetworkAvailable() {
         return true;
     }
@@ -322,5 +341,21 @@ public class BungeeCordMcNative implements McNative {
             if(parameters.length == 1)return new BungeeCordServerStatusResponse.DefaultPlayerInfo((String) parameters[0]);
             else return new BungeeCordServerStatusResponse.DefaultPlayerInfo((String) parameters[0],(UUID) parameters[1]);
         });
+    }
+
+    protected void registerSingletons(){
+        injector.getClassRegistry().registerSingleton(McNative.class,this);
+        injector.getClassRegistry().registerSingleton(LocalService.class,getLocal());
+        injector.getClassRegistry().registerSingleton(PlayerManager.class,getPlayerManager());
+        injector.getClassRegistry().registerSingleton(ExecutorService.class,getExecutorService());
+        injector.getClassRegistry().registerSingleton(Executor.class,getExecutorService());
+        injector.getClassRegistry().registerSingleton(TaskScheduler.class,getScheduler());
+        injector.getClassRegistry().registerSingleton(ServiceRegistry.class,getRegistry());
+        injector.getClassRegistry().registerSingleton(PluginManager.class,getPluginManager());
+        injector.getClassRegistry().registerSingleton(PretronicLogger.class,getLogger());
+        injector.getClassRegistry().registerSingleton(MinecraftPlatform.class,getPlatform());
+        injector.getClassRegistry().registerSingleton(DependencyManager.class,getDependencyManager());
+        injector.getClassRegistry().registerFactory(Network.class, () -> isNetworkAvailable() ? getNetwork() : null);
+        injector.getClassRegistry().registerFactory(Messenger.class, () -> isNetworkAvailable() ? getNetwork().getMessenger() : null);
     }
 }

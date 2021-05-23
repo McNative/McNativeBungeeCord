@@ -24,7 +24,6 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginDescription;
 import net.md_5.bungee.api.plugin.PluginManager;
-import net.md_5.bungee.config.Configuration;
 import net.pretronic.libraries.command.command.configuration.CommandConfiguration;
 import net.pretronic.libraries.command.command.configuration.DefaultCommandConfiguration;
 import net.pretronic.libraries.document.DocumentRegistry;
@@ -36,18 +35,20 @@ import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.interfaces.ObjectOwner;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import net.pretronic.libraries.utility.reflect.UnsafeInstanceCreator;
+import org.mcnative.runtime.api.McNative;
 import org.mcnative.runtime.api.McNativeConsoleCredentials;
 import org.mcnative.runtime.api.connection.MinecraftConnection;
+import org.mcnative.runtime.api.event.service.local.LocalServiceShutdownEvent;
+import org.mcnative.runtime.api.network.Network;
+import org.mcnative.runtime.api.network.component.server.ServerStatusResponse;
 import org.mcnative.runtime.api.player.ConnectedMinecraftPlayer;
+import org.mcnative.runtime.api.player.chat.ChatChannel;
+import org.mcnative.runtime.api.player.chat.GroupChatFormatter;
 import org.mcnative.runtime.api.player.tablist.Tablist;
 import org.mcnative.runtime.api.player.tablist.TablistEntry;
 import org.mcnative.runtime.api.player.tablist.TablistFormatter;
 import org.mcnative.runtime.api.player.tablist.TablistOverviewFormatter;
-import org.mcnative.runtime.api.protocol.Endpoint;
-import org.mcnative.runtime.api.protocol.packet.MinecraftPacketEvent;
-import org.mcnative.runtime.api.protocol.packet.MinecraftPacketListener;
-import org.mcnative.runtime.api.protocol.packet.PacketDirection;
-import org.mcnative.runtime.api.protocol.packet.type.sound.MinecraftSoundEffectPacket;
+import org.mcnative.runtime.api.proxy.ProxyService;
 import org.mcnative.runtime.api.text.components.MessageComponent;
 import org.mcnative.runtime.api.text.components.MessageKeyComponent;
 import org.mcnative.runtime.api.text.components.TargetMessageKeyComponent;
@@ -64,13 +65,6 @@ import org.mcnative.runtime.bungeecord.plugin.BungeeCordPluginManager;
 import org.mcnative.runtime.bungeecord.plugin.McNativeBungeeEventBus;
 import org.mcnative.runtime.bungeecord.plugin.command.BungeeCordCommandManager;
 import org.mcnative.runtime.bungeecord.server.BungeeCordServerMap;
-import org.mcnative.runtime.api.McNative;
-import org.mcnative.runtime.api.event.service.local.LocalServiceShutdownEvent;
-import org.mcnative.runtime.api.network.Network;
-import org.mcnative.runtime.api.network.component.server.ServerStatusResponse;
-import org.mcnative.runtime.api.player.chat.ChatChannel;
-import org.mcnative.runtime.api.player.chat.GroupChatFormatter;
-import org.mcnative.runtime.api.proxy.ProxyService;
 import org.mcnative.runtime.bungeecord.shared.McNativeBridgedEventBus;
 import org.mcnative.runtime.bungeecord.waterfall.McNativeWaterfallEventBus;
 import org.mcnative.runtime.client.integrations.ClientIntegration;
@@ -136,14 +130,15 @@ public class McNativeLauncher {
         BungeeCordCommandManager commandManager = new BungeeCordCommandManager(pluginManager,ProxyServer.getInstance().getPluginManager());
         logger.info(McNative.CONSOLE_PREFIX+"McNative initialised and injected command manager.");
 
+        DefaultEventBus mcnativeEventbus = new DefaultEventBus(new NetworkEventHandler());
+
         BungeeCordService localService = new BungeeCordService(new DefaultPacketManager()
-                ,commandManager,playerManager
-                ,new DefaultEventBus(new NetworkEventHandler())
-                ,serverMap);
+                ,commandManager,playerManager,mcnativeEventbus,serverMap);
 
         McNativeConsoleCredentials credentials = setupCredentials(variables);
-        BungeeCordMcNative instance = new BungeeCordMcNative(apiVersion,implementationVersion,pluginManager
-                ,playerManager, localService,variables,credentials);
+        BungeeCordMcNative instance = new BungeeCordMcNative(apiVersion,implementationVersion
+                ,pluginManager,playerManager, localService,variables,credentials);
+        mcnativeEventbus.setInjector(instance.getInjector());
 
         McNative.setInstance(instance);
         instance.setNetwork(setupNetwork(logger,localService,instance.getExecutorService(),serverMap));
@@ -158,6 +153,7 @@ public class McNativeLauncher {
         instance.registerDefaultCommands();
         instance.registerDefaultDescribers();
         instance.registerDefaultCreators();
+        instance.registerSingletons();
 
         proxy.setConfigurationAdapter(new McNativeConfigurationAdapter(proxy.getConfigurationAdapter()));
         logger.info(McNative.CONSOLE_PREFIX+"McNative has overwritten the configuration adapter.");
