@@ -28,6 +28,7 @@ import net.pretronic.libraries.command.command.configuration.CommandConfiguratio
 import net.pretronic.libraries.command.command.configuration.DefaultCommandConfiguration;
 import net.pretronic.libraries.document.DocumentRegistry;
 import net.pretronic.libraries.event.DefaultEventBus;
+import net.pretronic.libraries.event.injection.SilentErrorInjectorAdapter;
 import net.pretronic.libraries.logging.bridge.JdkPretronicLogger;
 import net.pretronic.libraries.message.bml.variable.VariableSet;
 import net.pretronic.libraries.plugin.description.PluginVersion;
@@ -138,7 +139,7 @@ public class McNativeLauncher {
         McNativeConsoleCredentials credentials = setupCredentials(variables);
         BungeeCordMcNative instance = new BungeeCordMcNative(apiVersion,implementationVersion
                 ,pluginManager,playerManager, localService,variables,credentials);
-        //mcnativeEventbus.setInjector(instance.getInjector());
+        mcnativeEventbus.setInjector(new SilentErrorInjectorAdapter(instance.getLogger(),instance.getInjector()));
 
         McNative.setInstance(instance);
         instance.setNetwork(setupNetwork(logger,localService,instance.getExecutorService(),serverMap));
