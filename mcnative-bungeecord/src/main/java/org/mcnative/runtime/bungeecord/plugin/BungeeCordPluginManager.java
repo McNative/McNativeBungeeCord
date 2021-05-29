@@ -250,6 +250,8 @@ public class BungeeCordPluginManager implements PluginManager {
         for (net.md_5.bungee.api.plugin.Plugin plugin : this.original.getPlugins()){
             if(plugin.equals(original)) return plugin;
         }
+        System.out.println("MAPPING PLUGIN "+original.getName());
+        new McNativeMappingException("Plugin "+original.getName()+" is not registered on BungeeCord side").printStackTrace();
         throw new McNativeMappingException("Plugin "+original.getName()+" is not registered on BungeeCord side");
     }
 
@@ -257,6 +259,8 @@ public class BungeeCordPluginManager implements PluginManager {
     public Plugin<?> getMappedPlugin(net.md_5.bungee.api.plugin.Plugin original){
         Validate.notNull(original);
         for (Plugin<?> plugin : plugins) if(plugin.equals(original)) return plugin;
+        System.out.println("MAPPING PLUGIN "+original.getDescription().getName());
+        new McNativeMappingException("Plugin "+original.getDescription().getName()+" is not registered on BungeeCord side").printStackTrace();
         throw new McNativeMappingException("Plugin "+original.getDescription().getName()+" is not registered on McNative side");
     }
 

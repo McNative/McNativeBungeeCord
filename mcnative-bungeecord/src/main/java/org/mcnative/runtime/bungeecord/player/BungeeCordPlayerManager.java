@@ -64,7 +64,7 @@ public class BungeeCordPlayerManager extends AbstractPlayerManager {
     @Internal
     public ConnectedMinecraftPlayer getMappedPlayer(net.md_5.bungee.api.connection.ProxiedPlayer player0){
         ConnectedMinecraftPlayer result = Iterators.findOne(this.onlineMinecraftPlayers, player -> player.getUniqueId() == player0.getUniqueId());
-        if(result == null) throw new McNativeMappingException("Plugin "+player0.getName()+" is not registered on McNative side");
+        if(result == null) throw new McNativeMappingException("Player "+player0.getName()+" is not registered on McNative side");
         return result;
     }
 

@@ -34,6 +34,7 @@ import net.pretronic.libraries.utility.annonations.Internal;
 import net.pretronic.libraries.utility.interfaces.InjectorAdapterAble;
 import net.pretronic.libraries.utility.interfaces.ObjectOwner;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
+import org.mcnative.runtime.bungeecord.McNativeLauncher;
 import org.mcnative.runtime.bungeecord.player.BungeeProxiedPlayer;
 import org.mcnative.runtime.bungeecord.plugin.BungeeCordPluginManager;
 import org.mcnative.runtime.bungeecord.plugin.MappedPlugin;
@@ -161,7 +162,15 @@ public class BungeeCordCommandManager implements CommandManager {
     @Internal
     void registerCommand(Plugin plugin, net.md_5.bungee.api.plugin.Command command){
         Validate.notNull(command);
-        this.commands.add(new BungeeCordCommand(command,plugin != null ? pluginManager.getMappedPlugin(plugin) : ObjectOwner.SYSTEM));
+
+        ObjectOwner owner;
+        if(plugin == null || plugin.getDescription().getName().equalsIgnoreCase("BadlionAntiCheat")){
+            owner = ObjectOwner.SYSTEM;
+        }else{
+            owner = pluginManager.getMappedPlugin(plugin);
+        }
+
+        this.commands.add(new BungeeCordCommand(command,owner));
     }
 
     @Internal
