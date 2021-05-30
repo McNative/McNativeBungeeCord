@@ -115,6 +115,15 @@ public class BungeecordProxyNetwork implements Network {
     }
 
     @Override
+    public NetworkIdentifier getIdentifier(UUID uuid) {
+        if(service.getIdentifier().getUniqueId().equals(uuid)) return service.getIdentifier();
+        for (MinecraftServer server : getServers()) {
+            if(server.getIdentifier().getUniqueId().equals(uuid)) return server.getIdentifier();
+        }
+        return null;
+    }
+
+    @Override
     public CommandManager getCommandManager() {
         throw new UnsupportedOperationException("Network commands are currently not supported");
     }
