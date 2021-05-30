@@ -27,7 +27,7 @@ public class BungeeMinecraftProtocolRewriteDecoder extends MinecraftProtocolRewr
     }
 
     @Override
-    public void handleInternalPacketManipulation(int packetId, ByteBuf buffer) {
+    public void handleInternalPacketManipulation(MinecraftConnection connection0,int packetId, ByteBuf buffer) {
         if(versionId.getPosition() == packetId){
             buffer.markReaderIndex();
             PositionExtractor.extractPosition(connection,buffer);
