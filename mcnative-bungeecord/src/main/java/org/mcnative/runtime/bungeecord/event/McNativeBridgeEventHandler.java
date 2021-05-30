@@ -87,7 +87,6 @@ public final class McNativeBridgeEventHandler {
     private final EventBus eventBus;
     private final Map<UUID, BungeeProxiedPlayer> initializingPlayer;
     private final Map<UUID, BungeeProxiedPlayer> pendingPlayers;
-    private final Map<Connection,String> tabCompleteCursors;
 
     public McNativeBridgeEventHandler(McNativeBridgedEventBus pluginManager, EventBus eventBus, BungeeCordPlayerManager playerManager, BungeeCordServerMap serverMap) {
         this.pluginManager = pluginManager;
@@ -97,7 +96,6 @@ public final class McNativeBridgeEventHandler {
 
         this.initializingPlayer = new ConcurrentHashMap<>();
         this.pendingPlayers = new ConcurrentHashMap<>();
-        this.tabCompleteCursors = new ConcurrentHashMap<>();
 
         setup();
     }
@@ -135,14 +133,6 @@ public final class McNativeBridgeEventHandler {
         eventBus.registerMappedClass(MinecraftPlayerChatEvent.class, ChatEvent.class);
         eventBus.registerMappedClass(MinecraftPlayerCommandPreprocessEvent.class, ChatEvent.class);
         pluginManager.registerMangedEvent(ChatEvent.class,this::handleChatEvent);
-
-        //Tab complete
-        eventBus.registerMappedClass(MinecraftPlayerTabCompleteEvent.class, TabCompleteEvent.class);
-        pluginManager.registerMangedEvent(TabCompleteEvent.class,this::handleTabComplete);
-
-        //Tab response
-        eventBus.registerMappedClass(MinecraftPlayerTabCompleteResponseEvent.class, TabCompleteResponseEvent.class);
-        pluginManager.registerMangedEvent(TabCompleteResponseEvent.class,this::handleTabCompleteResponse);
 
         //Logout
         eventBus.registerMappedClass(MinecraftPlayerLogoutEvent.class, PlayerDisconnectEvent.class);
@@ -325,24 +315,6 @@ public final class McNativeBridgeEventHandler {
                 }
             }
 
-        }else eventBus.callEvent(event);
-    }
-
-    private void handleTabComplete(TabCompleteEvent event){
-        if(event.getSender() instanceof ProxiedPlayer){
-            OnlineMinecraftPlayer player = playerManager.getMappedPlayer((ProxiedPlayer) event.getSender());
-            MinecraftPlayerTabCompleteEvent mcNativeEvent = new BungeeTabCompleteEvent(event,player);
-            this.tabCompleteCursors.put(event.getSender(),event.getCursor());
-            eventBus.callEvents(TabCompleteEvent.class,event,mcNativeEvent);
-        }else eventBus.callEvent(event);
-    }
-
-    private void handleTabCompleteResponse(TabCompleteResponseEvent event){
-        if(event.getReceiver() instanceof ProxiedPlayer){
-            OnlineMinecraftPlayer player = playerManager.getMappedPlayer((ProxiedPlayer) event.getReceiver());
-            String cursor = this.tabCompleteCursors.get(event.getReceiver());
-            MinecraftPlayerTabCompleteResponseEvent mcNativeEvent = new BungeeTabCompleteResponseEvent(event,player,cursor);
-            eventBus.callEvents(TabCompleteEvent.class,event,mcNativeEvent);
         }else eventBus.callEvent(event);
     }
 

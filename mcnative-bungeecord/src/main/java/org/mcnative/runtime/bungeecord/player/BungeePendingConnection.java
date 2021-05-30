@@ -26,6 +26,7 @@ import net.pretronic.libraries.message.bml.variable.VariableSet;
 import net.pretronic.libraries.utility.Validate;
 import net.pretronic.libraries.utility.annonations.Internal;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
+import org.mcnative.runtime.api.connection.MinecraftConnection;
 import org.mcnative.runtime.api.connection.MinecraftOutputStream;
 import org.mcnative.runtime.api.player.ConnectedMinecraftPlayer;
 import org.mcnative.runtime.bungeecord.McNativeBungeeCordConfiguration;
@@ -41,6 +42,7 @@ import org.mcnative.runtime.api.protocol.packet.PacketDirection;
 import org.mcnative.runtime.api.protocol.packet.type.MinecraftDisconnectPacket;
 import org.mcnative.runtime.api.text.components.MessageComponent;
 import org.mcnative.runtime.bungeecord.player.protocol.BungeeMinecraftProtocolRewriteDecoder;
+import org.mcnative.runtime.protocol.java.codec.LegacyTabCompleteForce;
 import org.mcnative.runtime.protocol.java.netty.MinecraftProtocolEncoder;
 import org.mcnative.runtime.protocol.java.netty.rewrite.MinecraftProtocolRewriteEncoder;
 
@@ -234,7 +236,17 @@ public class BungeePendingConnection implements PendingConnection {
 
         this.channel.pipeline().addAfter("packet-encoder","mcnative-packet-rewrite-encoder"
                 ,new MinecraftProtocolRewriteEncoder(McNative.getInstance().getLocal().getPacketManager()
-                        ,Endpoint.UPSTREAM, PacketDirection.OUTGOING,this));
+                        ,Endpoint.UPSTREAM, PacketDirection.OUTGOING,this){
+                    @Override
+                    public void handleInternalPacketManipulation(MinecraftConnection connection, int packetId, ByteBuf buffer) {
+                        if(LegacyTabCompleteForce.isDeclarePacket(connection.getProtocolVersion(),packetId)){
+                            //Force to legacy tab completion architecture
+                            buffer.clear();
+                            LegacyTabCompleteForce.rewrite(buffer);
+                        }
+                        super.handleInternalPacketManipulation(connection,packetId, buffer);
+                    }
+                });
     }
 
     @Internal

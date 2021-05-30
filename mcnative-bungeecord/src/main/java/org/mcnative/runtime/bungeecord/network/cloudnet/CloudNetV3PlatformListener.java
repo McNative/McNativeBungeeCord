@@ -71,11 +71,6 @@ public class CloudNetV3PlatformListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerPostLogin(PreLoginEvent event){
-
-        BridgeProxyHelper.getFallbacks().forEach(proxyFallback -> {
-
-        });
-
         boolean available = BridgeProxyHelper.getFallbacks()
                 .flatMap(proxyFallback -> BridgeProxyHelper.getCachedServiceInfoSnapshots(proxyFallback.getTask())
                         .map(serviceInfoSnapshot -> new PlayerFallback(proxyFallback.getPriority(), serviceInfoSnapshot)))

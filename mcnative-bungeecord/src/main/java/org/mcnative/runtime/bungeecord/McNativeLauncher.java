@@ -69,6 +69,7 @@ import org.mcnative.runtime.bungeecord.server.BungeeCordServerMap;
 import org.mcnative.runtime.bungeecord.shared.McNativeBridgedEventBus;
 import org.mcnative.runtime.bungeecord.waterfall.McNativeWaterfallEventBus;
 import org.mcnative.runtime.client.integrations.ClientIntegration;
+import org.mcnative.runtime.common.McNativeTabCompleteEventHandler;
 import org.mcnative.runtime.common.event.service.local.DefaultLocalServiceShutdownEvent;
 import org.mcnative.runtime.common.maf.MAFService;
 import org.mcnative.runtime.common.network.event.NetworkEventHandler;
@@ -168,6 +169,7 @@ public class McNativeLauncher {
         logger.info(McNative.CONSOLE_PREFIX+"McNative initialised and injected event bus.");
 
         new McNativeBridgeEventHandler(eventBus,localService.getEventBus(),playerManager,serverMap);
+        new McNativeTabCompleteEventHandler(localService.getEventBus(),localService.getPacketManager());
         logger.info(McNative.CONSOLE_PREFIX+"McNative has overwritten default bungeecord events.");
 
         McNativeBungeeCordConfiguration.postLoad();
