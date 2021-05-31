@@ -213,7 +213,8 @@ public class WrappedBungeeMinecraftServer implements MinecraftServer, VariableOb
     @Override
     public NetworkIdentifier getIdentifier() {
         if(this.identifier == null) this.identifier = McNative.getInstance().getNetwork().getIdentifier(original.getName());
-        if(this.identifier == null) throw new OperationFailedException("Server "+getName()+" is not registered in network technology");
+        if(this.identifier == null) return NetworkIdentifier.UNKNOWN;
+        //if(this.identifier == null) throw new OperationFailedException("Server "+getName()+" is not registered in network technology");
         return identifier;
     }
 
