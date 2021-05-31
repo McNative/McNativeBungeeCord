@@ -49,6 +49,7 @@
         <!-- Project settings -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+
         <!-- Dependency version -->
         <dependency.mcnative.api>1.4.49.154</dependency.mcnative.api>
         <dependency.mcnative.common>1.13.39.151</dependency.mcnative.common>
