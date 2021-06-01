@@ -84,6 +84,7 @@ public class BungeePendingConnection implements PendingConnection {
             this.channel = ReflectionUtil.getFieldValue(channelWrapper, "ch", Channel.class);
         }else throw new IllegalArgumentException("Invalid pending connection.");
         this.gameProfile = extractGameProfile();
+        injectPreUpstreamProtocolHandlersToPipeline();
     }
 
     @Override
@@ -227,8 +228,15 @@ public class BungeePendingConnection implements PendingConnection {
     }
 
     @Internal
-    public void injectPostUpstreamProtocolHandlersToPipeline(){
+    public void injectPreUpstreamProtocolHandlersToPipeline(){
+        this.channel.pipeline().addAfter("packet-encoder","mcnative-packet-encoder"
+                ,new MinecraftProtocolEncoder(McNative.getInstance().getLocal().getPacketManager()
+                        ,Endpoint.UPSTREAM, PacketDirection.OUTGOING,this));
+    }
 
+    @Internal
+    public void injectPostUpstreamProtocolHandlersToPipeline(){
+        this.channel.pipeline().remove("mcnative-packet-encoder");
         this.channel.pipeline().addBefore("packet-encoder","mcnative-packet-encoder"
                 ,new MinecraftProtocolEncoder(McNative.getInstance().getLocal().getPacketManager()
                         ,Endpoint.UPSTREAM, PacketDirection.OUTGOING,this));
