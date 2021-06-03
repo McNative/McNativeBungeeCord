@@ -21,19 +21,17 @@ package org.mcnative.runtime.bungeecord.player;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandler;
 import io.netty.handler.codec.MessageToByteEncoder;
 import net.pretronic.libraries.message.bml.variable.VariableSet;
 import net.pretronic.libraries.utility.Validate;
 import net.pretronic.libraries.utility.annonations.Internal;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
-import org.mcnative.runtime.api.connection.MinecraftConnection;
-import org.mcnative.runtime.api.connection.MinecraftOutputStream;
-import org.mcnative.runtime.api.player.ConnectedMinecraftPlayer;
-import org.mcnative.runtime.bungeecord.McNativeBungeeCordConfiguration;
 import org.mcnative.runtime.api.McNative;
 import org.mcnative.runtime.api.connection.ConnectionState;
+import org.mcnative.runtime.api.connection.MinecraftConnection;
+import org.mcnative.runtime.api.connection.MinecraftOutputStream;
 import org.mcnative.runtime.api.connection.PendingConnection;
+import org.mcnative.runtime.api.player.ConnectedMinecraftPlayer;
 import org.mcnative.runtime.api.player.profile.GameProfile;
 import org.mcnative.runtime.api.protocol.Endpoint;
 import org.mcnative.runtime.api.protocol.MinecraftEdition;
@@ -42,6 +40,7 @@ import org.mcnative.runtime.api.protocol.packet.MinecraftPacket;
 import org.mcnative.runtime.api.protocol.packet.PacketDirection;
 import org.mcnative.runtime.api.protocol.packet.type.MinecraftDisconnectPacket;
 import org.mcnative.runtime.api.text.components.MessageComponent;
+import org.mcnative.runtime.bungeecord.McNativeBungeeCordConfiguration;
 import org.mcnative.runtime.bungeecord.player.protocol.BungeeMinecraftProtocolRewriteDecoder;
 import org.mcnative.runtime.protocol.java.codec.LegacyTabCompleteForce;
 import org.mcnative.runtime.protocol.java.netty.MinecraftProtocolEncoder;
@@ -51,7 +50,6 @@ import org.mcnative.runtime.protocol.java.netty.wrapper.McNativeMessageEncoderIg
 import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.net.InetSocketAddress;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 

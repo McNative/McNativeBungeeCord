@@ -66,6 +66,9 @@ public class CloudNetV3PlatformListener implements Listener {
 
     @EventHandler
     public void onMessageReceive(BungeeChannelMessageReceiveEvent event){
+        if (event.getChannel().equals("mcnative")) {
+            System.out.println(event.getData().getString("data"));
+        }
         this.messenger.handleMessageEvent(event.getChannel(),event.getMessage(),event.getData());
     }
 
