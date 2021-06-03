@@ -28,9 +28,11 @@ import net.pretronic.libraries.dependency.DependencyManager;
 import net.pretronic.libraries.document.DocumentFactory;
 import net.pretronic.libraries.document.DocumentRegistry;
 import net.pretronic.libraries.document.injection.DependencyInjectionObjectInstanceFactory;
+import net.pretronic.libraries.document.injection.ObjectInstanceFactory;
 import net.pretronic.libraries.event.EventPriority;
 import net.pretronic.libraries.event.injection.DefaultInjectorService;
 import net.pretronic.libraries.event.injection.InjectorService;
+import net.pretronic.libraries.event.injection.SilentErrorInjectorAdapter;
 import net.pretronic.libraries.logging.Debug;
 import net.pretronic.libraries.logging.PretronicLogger;
 import net.pretronic.libraries.logging.bridge.JdkPretronicLogger;
@@ -50,6 +52,7 @@ import net.pretronic.libraries.plugin.service.ServiceRegistry;
 import net.pretronic.libraries.utility.GeneralUtil;
 import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.Validate;
+import net.pretronic.libraries.utility.reflect.UnsafeInstanceCreator;
 import org.mcnative.runtime.api.loader.LoaderConfiguration;
 import org.mcnative.runtime.api.network.messaging.Messenger;
 import org.mcnative.runtime.api.player.bossbar.BossBar;
@@ -155,7 +158,30 @@ public class BungeeCordMcNative implements McNative {
         this.loaderConfiguration = DefaultLoaderConfiguration.load(new File("plugins/McNative/update.yml"));
         SLF4JStaticBridge.trySetLogger(logger);
 
-        DocumentRegistry.setInstanceFactory(new DependencyInjectionObjectInstanceFactory(injector));
+        DocumentRegistry.setInstanceFactory(new ObjectInstanceFactory() {
+            @Override
+            public <T> T newInstance(Class<?> clazz) {
+                return (T) UnsafeInstanceCreator.newInstance(clazz);
+            }
+
+            @Override
+            public void inject(Class<?> clazz) {
+                try {
+                    injector.inject(clazz);
+                } catch (Throwable var3) {
+                    var3.printStackTrace();
+                }
+            }
+
+            @Override
+            public void inject(Object obj) {
+                try {
+                    injector.inject(obj);
+                } catch (Throwable var3) {
+                    var3.printStackTrace();
+                }
+            }
+        });
         //DefaultEventBus
     }
 
