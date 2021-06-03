@@ -155,7 +155,7 @@ public class BungeeCordMcNative implements McNative {
         this.loaderConfiguration = DefaultLoaderConfiguration.load(new File("plugins/McNative/update.yml"));
         SLF4JStaticBridge.trySetLogger(logger);
 
-        DocumentRegistry.setInstanceFactory(new DependencyInjectionObjectInstanceFactory(injector));
+       // DocumentRegistry.setInstanceFactory(new DependencyInjectionObjectInstanceFactory(injector));
         //DefaultEventBus
     }
 
