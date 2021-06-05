@@ -243,6 +243,7 @@ public class BungeeCordPluginManager implements PluginManager {
         if(loaders.contains(loader)) throw new IllegalArgumentException("Loader is already registered.");
         this.loaders.add(loader);
         if(loader.isInstanceAvailable()) {
+            System.out.println(loader.getDescription().getName()+" | "+loader.getDescription().getId());
             Iterators.removeOne(this.plugins, plugin -> plugin.getName().equals(loader.getDescription().getName()));
             this.plugins.add(loader.getInstance());
         }

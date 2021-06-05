@@ -1,5 +1,5 @@
 name: 'McNative'
 version: '1.0.0'
 main: 'org.mcnative.runtime.bungeecord.BungeeCordMcNativeBootstrap'
-author: 'Davide Wietlisbach'
+author: 'Pretronic'
 softdepends: ['CloudNetAPI','CloudNet-Bridge']
