@@ -143,8 +143,7 @@ public class BungeeCordMcNative implements McNative {
         this.scheduler = new SimpleTaskScheduler();
         this.consoleSender = new McNativeCommand.MappedCommandSender(ProxyServer.getInstance().getConsole());
         this.dependencyManager = new DependencyManager(logger,new File("plugins/McNative/lib/dependencies"));
-        this.dependencyManager.setDefaultLoader(new LegacyReflectedDependencyClassLoader());
-        //this.dependencyManager.setDefaultLoader(new BungeeCordDependencyLoader());
+        this.dependencyManager.setDefaultLoader(new BungeeCordDependencyLoader());
 
         this.factory = new DefaultObjectFactory();
         this.variables = variables;
