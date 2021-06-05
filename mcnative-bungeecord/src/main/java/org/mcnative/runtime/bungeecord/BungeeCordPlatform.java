@@ -21,6 +21,8 @@ package org.mcnative.runtime.bungeecord;
 
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.protocol.ProtocolConstants;
+import net.pretronic.libraries.logging.PretronicLogger;
+import org.mcnative.runtime.api.McNative;
 import org.mcnative.runtime.api.MinecraftPlatform;
 import org.mcnative.runtime.api.protocol.MinecraftEdition;
 import org.mcnative.runtime.api.protocol.MinecraftProtocolVersion;
@@ -35,10 +37,10 @@ public class BungeeCordPlatform implements MinecraftPlatform {
     private final MinecraftProtocolVersion newest;
     private final Collection<MinecraftProtocolVersion> versions;
 
-    public BungeeCordPlatform() {
+    public BungeeCordPlatform(PretronicLogger logger) {
         this.latestLogLocation = detectLatestLogLocation();
         this.versions = new ArrayList<>();
-        this.newest = extractVersions(this.versions);
+        this.newest = extractVersions(this.versions,logger);
     }
 
     @Override
@@ -82,7 +84,7 @@ public class BungeeCordPlatform implements MinecraftPlatform {
         return file;
     }
 
-    private static MinecraftProtocolVersion extractVersions(Collection<MinecraftProtocolVersion> versions){
+    private static MinecraftProtocolVersion extractVersions(Collection<MinecraftProtocolVersion> versions,PretronicLogger logger){
         MinecraftProtocolVersion newest = MinecraftProtocolVersion.UNKNOWN;
         for (Integer supportedVersionId : ProtocolConstants.SUPPORTED_VERSION_IDS) {
             try{
@@ -90,8 +92,7 @@ public class BungeeCordPlatform implements MinecraftPlatform {
                 versions.add(version);
                 if(supportedVersionId >= newest.getNumber()) newest = version;
             }catch (Exception exception){
-                System.out.println("Protocol version "+supportedVersionId+" not found");
-                exception.printStackTrace();
+                logger.warn("Protocol version "+supportedVersionId+" not found");
             }
         }
         return newest;

@@ -240,11 +240,9 @@ public class BungeeCordPluginManager implements PluginManager {
 
     @Override
     public void provideLoader(PluginLoader loader) {
-        System.out.println("PROVIDE LOADER "+loader.isInstanceAvailable());
         if(loaders.contains(loader)) throw new IllegalArgumentException("Loader is already registered.");
         this.loaders.add(loader);
         if(loader.isInstanceAvailable()) {
-            System.out.println(loader.getDescription().getName()+" | "+loader.getDescription().getId());
             Iterators.removeOne(this.plugins, plugin -> plugin.getName().equals(loader.getDescription().getName()));
             this.plugins.add(loader.getInstance());
         }
@@ -272,8 +270,8 @@ public class BungeeCordPluginManager implements PluginManager {
         Map<String, net.md_5.bungee.api.plugin.Plugin> oldMap = ReflectionUtil.getFieldValue(original,"plugins",Map.class);
 
         CallbackMap<String, net.md_5.bungee.api.plugin.Plugin> newMap = new LinkedHashCallbackMap<>();
-        newMap.setPutCallback((s, plugin) ->{
-            if(Iterators.findOne(this.plugins, o -> o.getName().equals(plugin.getDescription().getName())) == null){
+        newMap.setPutCallback((s, plugin) ->{//org.mcnative.loader.bootstrap.template
+            if(!plugin.getDescription().getMain().equals("reflected")){
                 plugins.add(new MappedPlugin(plugin));
             }
         });

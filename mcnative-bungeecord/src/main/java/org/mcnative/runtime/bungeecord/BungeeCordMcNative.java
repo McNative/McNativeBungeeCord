@@ -118,9 +118,11 @@ public class BungeeCordMcNative implements McNative {
     public BungeeCordMcNative(PluginVersion apiVersion,PluginVersion implVersion,PluginManager pluginManager, PlayerManager playerManager, LocalService local,Collection<Env> variables, McNativeConsoleCredentials consoleCredentials) {
         this.implementationVersion = implVersion;
         this.apiVersion = apiVersion;
-        this.platform = new BungeeCordPlatform();
 
         JdkPretronicLogger logger0 = new JdkPretronicLogger(ProxyServer.getInstance().getLogger());
+
+        this.platform = new BungeeCordPlatform(logger0);
+
         if(McNativeBungeeCordConfiguration.DEBUG){
             logger0.getLogLevelTranslation().replace(LogLevel.DEBUG, Level.INFO);
             logger0.setPrefixProcessor(level -> level == LogLevel.DEBUG ? "(Debug) " : null);
