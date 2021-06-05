@@ -67,7 +67,6 @@ import org.mcnative.runtime.bungeecord.player.permission.BungeeCordPlayerDesign;
 import org.mcnative.runtime.bungeecord.plugin.MappedPlugin;
 import org.mcnative.runtime.bungeecord.plugin.command.McNativeCommand;
 import org.mcnative.runtime.bungeecord.plugin.dependency.BungeeCordDependencyLoader;
-import org.mcnative.runtime.bungeecord.plugin.dependency.LegacyReflectedDependencyClassLoader;
 import org.mcnative.runtime.bungeecord.server.BungeeCordServerStatusResponse;
 import org.mcnative.runtime.bungeecord.server.WrappedBungeeMinecraftServer;
 import org.mcnative.runtime.api.*;
@@ -143,7 +142,7 @@ public class BungeeCordMcNative implements McNative {
         this.scheduler = new SimpleTaskScheduler();
         this.consoleSender = new McNativeCommand.MappedCommandSender(ProxyServer.getInstance().getConsole());
         this.dependencyManager = new DependencyManager(logger,new File("plugins/McNative/lib/dependencies"));
-        this.dependencyManager.setDefaultLoader(new LegacyReflectedDependencyClassLoader());
+        this.dependencyManager.setDefaultLoader(new BungeeCordDependencyLoader());
 
         this.factory = new DefaultObjectFactory();
         this.variables = variables;
