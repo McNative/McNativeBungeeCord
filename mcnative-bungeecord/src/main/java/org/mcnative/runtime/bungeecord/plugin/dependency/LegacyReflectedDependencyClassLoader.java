@@ -20,35 +20,36 @@
 
 package org.mcnative.runtime.bungeecord.plugin.dependency;
 
+import jdk.internal.loader.URLClassPath;
 import net.pretronic.libraries.dependency.loader.DependencyClassLoader;
-import net.pretronic.libraries.utility.reflect.ReflectException;
+import net.pretronic.libraries.utility.exception.OperationFailedException;
+import net.pretronic.libraries.utility.reflect.ReflectionUtil;
+import sun.misc.Unsafe;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
 
 public class LegacyReflectedDependencyClassLoader implements DependencyClassLoader {
 
-    private final static Method METHOD_ADD_URL;
+    private final static Field FIELD_UCP;
 
     static {
         try {
-            METHOD_ADD_URL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-            METHOD_ADD_URL.setAccessible(true);
-        } catch (NoSuchMethodException exception) {
+            FIELD_UCP = URLClassLoader.class.getDeclaredField("ucp");
+            FIELD_UCP.setAccessible(true);
+        } catch (NoSuchFieldException exception) {
             throw new ExceptionInInitializerError(exception);
         }
     }
 
     @Override
     public ClassLoader load(ClassLoader parent, URL location) {
-        try {
-            if(parent == null) parent = getClass().getClassLoader();
-            METHOD_ADD_URL.invoke(parent, location);
-            return parent;
-        } catch (IllegalAccessException | InvocationTargetException exception) {
-            throw new ReflectException(exception);
-        }
+        Unsafe unsafe = ReflectionUtil.getUnsafe();
+        if(parent == null) parent = getClass().getClassLoader();
+        URLClassPath ucp = (URLClassPath) unsafe.getObject(parent,unsafe.objectFieldOffset(FIELD_UCP));
+        if(ucp == null) throw new OperationFailedException("Could not extract ucp from "+parent.getClass());
+        ucp.addURL(location);
+        return parent;
     }
 }
