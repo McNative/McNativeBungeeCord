@@ -304,7 +304,7 @@ public class McNativeLauncher {
         PluginDescription description = new PluginDescription();
         description.setName("McNative");
         description.setVersion(McNativeLauncher.class.getPackage().getImplementationVersion());
-        description.setAuthor("Pretronic and McNative contributors");
+        description.setAuthor("Pretronic");
         description.setMain("reflected");
 
         Plugin plugin = UnsafeInstanceCreator.newInstance(DummyPlugin.class);
