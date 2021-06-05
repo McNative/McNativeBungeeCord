@@ -240,6 +240,7 @@ public class BungeeCordPluginManager implements PluginManager {
 
     @Override
     public void provideLoader(PluginLoader loader) {
+        System.out.println("PROVIDE LOADER "+loader.isInstanceAvailable());
         if(loaders.contains(loader)) throw new IllegalArgumentException("Loader is already registered.");
         this.loaders.add(loader);
         if(loader.isInstanceAvailable()) {
