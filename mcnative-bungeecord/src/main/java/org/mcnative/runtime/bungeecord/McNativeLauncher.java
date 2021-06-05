@@ -85,6 +85,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class McNativeLauncher {
@@ -184,6 +185,15 @@ public class McNativeLauncher {
         }
 
         logger.info(McNative.CONSOLE_PREFIX+"McNative successfully started.");
+
+        McNative.getInstance().getScheduler().createTask(ObjectOwner.SYSTEM).async().delay(5, TimeUnit.SECONDS).execute(new Runnable() {
+            @Override
+            public void run() {
+                for (net.pretronic.libraries.plugin.Plugin<?> plugin1 : McNative.getInstance().getPluginManager().getPlugins()) {
+                    System.out.println(plugin1.getName()+" | "+plugin1.getDescription().getId());
+                }
+            }
+        });
 
     }
 
