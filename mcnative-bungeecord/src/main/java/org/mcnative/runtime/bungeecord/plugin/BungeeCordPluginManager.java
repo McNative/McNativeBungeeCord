@@ -271,7 +271,6 @@ public class BungeeCordPluginManager implements PluginManager {
 
         CallbackMap<String, net.md_5.bungee.api.plugin.Plugin> newMap = new LinkedHashCallbackMap<>();
         newMap.setPutCallback((s, plugin) ->{//org.mcnative.loader.bootstrap.template
-            System.out.println(plugin.getDescription().getName()+" | "+plugin.getDescription().getMain());
             if(plugin.getDescription().getName().equalsIgnoreCase("McNative") || !plugin.getDescription().getMain().equals("reflected")){
                 plugins.add(new MappedPlugin(plugin));
             }
