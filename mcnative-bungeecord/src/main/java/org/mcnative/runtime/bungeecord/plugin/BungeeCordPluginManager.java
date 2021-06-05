@@ -271,7 +271,9 @@ public class BungeeCordPluginManager implements PluginManager {
 
         CallbackMap<String, net.md_5.bungee.api.plugin.Plugin> newMap = new LinkedHashCallbackMap<>();
         newMap.setPutCallback((s, plugin) ->{
-            plugins.add(new MappedPlugin(plugin));
+            if(Iterators.findOne(this.plugins, o -> o.getName().equals(plugin.getDescription().getName())) == null){
+                plugins.add(new MappedPlugin(plugin));
+            }
         });
         newMap.setRemoveCallback((s, plugin) -> plugins.remove(plugin));
 
