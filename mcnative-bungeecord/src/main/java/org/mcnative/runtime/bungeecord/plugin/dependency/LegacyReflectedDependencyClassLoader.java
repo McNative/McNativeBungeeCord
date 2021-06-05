@@ -37,7 +37,6 @@ public class LegacyReflectedDependencyClassLoader implements DependencyClassLoad
     static {
         try {
             FIELD_UCP = URLClassLoader.class.getDeclaredField("ucp");
-            FIELD_UCP.setAccessible(true);
         } catch (NoSuchFieldException exception) {
             throw new ExceptionInInitializerError(exception);
         }

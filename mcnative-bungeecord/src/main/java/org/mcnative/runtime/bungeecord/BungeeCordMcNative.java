@@ -158,6 +158,7 @@ public class BungeeCordMcNative implements McNative {
         SLF4JStaticBridge.trySetLogger(logger);
 
         DocumentRegistry.setInstanceFactory(new ObjectInstanceFactory() {
+            @SuppressWarnings("unchecked")
             @Override
             public <T> T newInstance(Class<?> clazz) {
                 return (T) UnsafeInstanceCreator.newInstance(clazz);
