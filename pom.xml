@@ -25,7 +25,7 @@
 
     <groupId>org.mcnative.runtime.bungeecord</groupId>
     <artifactId>McNativeBungeeCord</artifactId>
-    <version>1.29.13.309-SNAPSHOT</version>
+    <version>1.29.14.310-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
