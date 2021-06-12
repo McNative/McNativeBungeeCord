@@ -25,14 +25,11 @@ import net.pretronic.libraries.command.sender.CommandSender;
 import net.pretronic.libraries.concurrent.TaskScheduler;
 import net.pretronic.libraries.concurrent.simple.SimpleTaskScheduler;
 import net.pretronic.libraries.dependency.DependencyManager;
-import net.pretronic.libraries.document.DocumentFactory;
 import net.pretronic.libraries.document.DocumentRegistry;
-import net.pretronic.libraries.document.injection.DependencyInjectionObjectInstanceFactory;
 import net.pretronic.libraries.document.injection.ObjectInstanceFactory;
 import net.pretronic.libraries.event.EventPriority;
 import net.pretronic.libraries.event.injection.DefaultInjectorService;
 import net.pretronic.libraries.event.injection.InjectorService;
-import net.pretronic.libraries.event.injection.SilentErrorInjectorAdapter;
 import net.pretronic.libraries.logging.Debug;
 import net.pretronic.libraries.logging.PretronicLogger;
 import net.pretronic.libraries.logging.bridge.JdkPretronicLogger;
@@ -53,12 +50,24 @@ import net.pretronic.libraries.utility.GeneralUtil;
 import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.Validate;
 import net.pretronic.libraries.utility.reflect.UnsafeInstanceCreator;
+import org.mcnative.runtime.api.*;
 import org.mcnative.runtime.api.loader.LoaderConfiguration;
+import org.mcnative.runtime.api.network.Network;
+import org.mcnative.runtime.api.network.component.server.MinecraftServer;
+import org.mcnative.runtime.api.network.component.server.ServerStatusResponse;
 import org.mcnative.runtime.api.network.messaging.Messenger;
+import org.mcnative.runtime.api.player.PlayerDesign;
+import org.mcnative.runtime.api.player.PlayerManager;
 import org.mcnative.runtime.api.player.bossbar.BossBar;
 import org.mcnative.runtime.api.player.chat.ChatChannel;
+import org.mcnative.runtime.api.player.data.PlayerDataProvider;
 import org.mcnative.runtime.api.player.profile.GameProfileLoader;
 import org.mcnative.runtime.api.player.tablist.Tablist;
+import org.mcnative.runtime.api.plugin.MinecraftPlugin;
+import org.mcnative.runtime.api.plugin.configuration.ConfigurationProvider;
+import org.mcnative.runtime.api.serviceprovider.permission.PermissionProvider;
+import org.mcnative.runtime.api.serviceprovider.placeholder.PlaceholderProvider;
+import org.mcnative.runtime.api.text.format.ColoredString;
 import org.mcnative.runtime.api.utils.Env;
 import org.mcnative.runtime.bungeecord.player.BungeeProxiedPlayer;
 import org.mcnative.runtime.bungeecord.player.BungeeTablist;
@@ -67,21 +76,8 @@ import org.mcnative.runtime.bungeecord.player.permission.BungeeCordPlayerDesign;
 import org.mcnative.runtime.bungeecord.plugin.MappedPlugin;
 import org.mcnative.runtime.bungeecord.plugin.command.McNativeCommand;
 import org.mcnative.runtime.bungeecord.plugin.dependency.BungeeCordDependencyLoader;
-import org.mcnative.runtime.bungeecord.plugin.dependency.LegacyReflectedDependencyClassLoader;
 import org.mcnative.runtime.bungeecord.server.BungeeCordServerStatusResponse;
 import org.mcnative.runtime.bungeecord.server.WrappedBungeeMinecraftServer;
-import org.mcnative.runtime.api.*;
-import org.mcnative.runtime.api.network.Network;
-import org.mcnative.runtime.api.network.component.server.MinecraftServer;
-import org.mcnative.runtime.api.network.component.server.ServerStatusResponse;
-import org.mcnative.runtime.api.player.PlayerDesign;
-import org.mcnative.runtime.api.player.PlayerManager;
-import org.mcnative.runtime.api.player.data.PlayerDataProvider;
-import org.mcnative.runtime.api.plugin.MinecraftPlugin;
-import org.mcnative.runtime.api.plugin.configuration.ConfigurationProvider;
-import org.mcnative.runtime.api.serviceprovider.permission.PermissionProvider;
-import org.mcnative.runtime.api.serviceprovider.placeholder.PlaceholderProvider;
-import org.mcnative.runtime.api.text.format.ColoredString;
 import org.mcnative.runtime.common.DefaultLoaderConfiguration;
 import org.mcnative.runtime.common.DefaultObjectFactory;
 import org.mcnative.runtime.common.player.*;
@@ -91,13 +87,10 @@ import org.mcnative.runtime.common.serviceprovider.McNativePlaceholderProvider;
 import org.mcnative.runtime.common.serviceprovider.message.DefaultMessageProvider;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.logging.Level;
 
 public class BungeeCordMcNative implements McNative {
@@ -125,9 +118,11 @@ public class BungeeCordMcNative implements McNative {
     public BungeeCordMcNative(PluginVersion apiVersion,PluginVersion implVersion,PluginManager pluginManager, PlayerManager playerManager, LocalService local,Collection<Env> variables, McNativeConsoleCredentials consoleCredentials) {
         this.implementationVersion = implVersion;
         this.apiVersion = apiVersion;
-        this.platform = new BungeeCordPlatform();
 
         JdkPretronicLogger logger0 = new JdkPretronicLogger(ProxyServer.getInstance().getLogger());
+
+        this.platform = new BungeeCordPlatform(logger0);
+
         if(McNativeBungeeCordConfiguration.DEBUG){
             logger0.getLogLevelTranslation().replace(LogLevel.DEBUG, Level.INFO);
             logger0.setPrefixProcessor(level -> level == LogLevel.DEBUG ? "(Debug) " : null);
@@ -143,8 +138,7 @@ public class BungeeCordMcNative implements McNative {
         this.scheduler = new SimpleTaskScheduler();
         this.consoleSender = new McNativeCommand.MappedCommandSender(ProxyServer.getInstance().getConsole());
         this.dependencyManager = new DependencyManager(logger,new File("plugins/McNative/lib/dependencies"));
-        this.dependencyManager.setDefaultLoader(new LegacyReflectedDependencyClassLoader());
-        //this.dependencyManager.setDefaultLoader(new BungeeCordDependencyLoader());
+        this.dependencyManager.setDefaultLoader(new BungeeCordDependencyLoader());
 
         this.factory = new DefaultObjectFactory();
         this.variables = variables;
@@ -159,6 +153,7 @@ public class BungeeCordMcNative implements McNative {
         SLF4JStaticBridge.trySetLogger(logger);
 
         DocumentRegistry.setInstanceFactory(new ObjectInstanceFactory() {
+            @SuppressWarnings("unchecked")
             @Override
             public <T> T newInstance(Class<?> clazz) {
                 return (T) UnsafeInstanceCreator.newInstance(clazz);

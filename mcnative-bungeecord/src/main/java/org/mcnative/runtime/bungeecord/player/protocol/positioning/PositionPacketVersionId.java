@@ -10,7 +10,8 @@ public enum PositionPacketVersionId {
     V1_12(MinecraftProtocolVersion.JE_1_12,0x0D,0x0F,0x0E),
     V1_13(MinecraftProtocolVersion.JE_1_13,0x10,0x12,0x11),
     V1_14(MinecraftProtocolVersion.JE_1_14,0x11,0x13,0x12),
-    V1_16(MinecraftProtocolVersion.JE_1_16,0x12,0x14,0x13);
+    V1_16(MinecraftProtocolVersion.JE_1_16,0x12,0x14,0x13),
+    V1_17(MinecraftProtocolVersion.JE_1_17,0x11,0x13,0x12);
 
 
     private final MinecraftProtocolVersion version;

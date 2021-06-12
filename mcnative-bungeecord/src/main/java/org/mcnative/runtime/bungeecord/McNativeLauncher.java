@@ -85,6 +85,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 public class McNativeLauncher {
@@ -184,7 +185,6 @@ public class McNativeLauncher {
         }
 
         logger.info(McNative.CONSOLE_PREFIX+"McNative successfully started.");
-
     }
 
     private static boolean isWaterfallBase(){
@@ -304,7 +304,7 @@ public class McNativeLauncher {
         PluginDescription description = new PluginDescription();
         description.setName("McNative");
         description.setVersion(McNativeLauncher.class.getPackage().getImplementationVersion());
-        description.setAuthor("Pretronic and McNative contributors");
+        description.setAuthor("Pretronic");
         description.setMain("reflected");
 
         Plugin plugin = UnsafeInstanceCreator.newInstance(DummyPlugin.class);
