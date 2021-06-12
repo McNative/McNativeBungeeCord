@@ -45,6 +45,7 @@ import org.mcnative.runtime.common.serviceprovider.message.ResourceMessageExtrac
 import java.io.File;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public class BungeeCordPluginManager implements PluginManager {
@@ -241,7 +242,10 @@ public class BungeeCordPluginManager implements PluginManager {
     public void provideLoader(PluginLoader loader) {
         if(loaders.contains(loader)) throw new IllegalArgumentException("Loader is already registered.");
         this.loaders.add(loader);
-        if(loader.isInstanceAvailable()) this.plugins.add(loader.getInstance());
+        if(loader.isInstanceAvailable()) {
+            Iterators.removeOne(this.plugins, plugin -> plugin.getName().equals(loader.getDescription().getName()));
+            this.plugins.add(loader.getInstance());
+        }
     }
 
     @Internal
@@ -266,8 +270,10 @@ public class BungeeCordPluginManager implements PluginManager {
         Map<String, net.md_5.bungee.api.plugin.Plugin> oldMap = ReflectionUtil.getFieldValue(original,"plugins",Map.class);
 
         CallbackMap<String, net.md_5.bungee.api.plugin.Plugin> newMap = new LinkedHashCallbackMap<>();
-        newMap.setPutCallback((s, plugin) ->{
-            plugins.add(new MappedPlugin(plugin));
+        newMap.setPutCallback((s, plugin) ->{//org.mcnative.loader.bootstrap.template
+            if(plugin.getDescription().getName().equalsIgnoreCase("McNative") || !plugin.getDescription().getMain().equals("reflected")){
+                plugins.add(new MappedPlugin(plugin));
+            }
         });
         newMap.setRemoveCallback((s, plugin) -> plugins.remove(plugin));
 
