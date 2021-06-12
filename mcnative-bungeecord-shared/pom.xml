@@ -5,7 +5,7 @@
     <parent>
         <artifactId>McNativeBungeeCord</artifactId>
         <groupId>org.mcnative.runtime.bungeecord</groupId>
-        <version>1.29.20.316-SNAPSHOT</version>
+        <version>1.29.20.317-BETA</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
