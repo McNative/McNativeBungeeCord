@@ -52,7 +52,7 @@
 
         <!-- Dependency version -->
         <dependency.mcnative.api>1.6.19.205-SNAPSHOT</dependency.mcnative.api>
-        <dependency.mcnative.common>1.14.33.189-SNAPSHOTUp</dependency.mcnative.common>
+        <dependency.mcnative.common>1.14.33.189-SNAPSHOT</dependency.mcnative.common>
         <dependency.netty>4.1.56.Final</dependency.netty>
 
         <dependency.bungeecord>1.16-R0.4-SNAPSHOT</dependency.bungeecord>
