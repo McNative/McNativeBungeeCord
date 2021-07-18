@@ -23,6 +23,7 @@ import net.md_5.bungee.api.config.ConfigurationAdapter;
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.pretronic.libraries.utility.Iterators;
+import net.pretronic.libraries.utility.exception.OperationFailedException;
 import org.mcnative.runtime.api.McNative;
 import org.mcnative.runtime.api.event.service.local.LocalServiceStartupEvent;
 import org.mcnative.runtime.api.network.component.server.MinecraftServer;
@@ -36,13 +37,16 @@ import java.util.Map;
 public class McNativeConfigurationAdapter implements ConfigurationAdapter {
 
     private final ConfigurationAdapter original;
+    private boolean loaded;
 
     public McNativeConfigurationAdapter(ConfigurationAdapter original) {
         this.original = original;
+        this.loaded = false;
     }
 
     @Override
     public void load() {
+        this.loaded = true;
         this.original.load();
 
         McNativeBungeeCordConfiguration.SERVER_SERVERS.forEach((name, config) -> {
@@ -87,6 +91,7 @@ public class McNativeConfigurationAdapter implements ConfigurationAdapter {
 
     @Override
     public Collection<ListenerInfo> getListeners() {
+        if(!loaded) throw new OperationFailedException("Configuration is not loaded yet");
         return original.getListeners();
     }
 
