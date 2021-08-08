@@ -227,9 +227,11 @@ public class BungeePendingConnection implements PendingConnection {
 
     @Internal
     public void injectPreUpstreamProtocolHandlersToPipeline(){
-        this.channel.pipeline().addAfter("packet-encoder","mcnative-packet-encoder"
-                ,new MinecraftProtocolEncoder(McNative.getInstance().getLocal().getPacketManager()
-                        ,Endpoint.UPSTREAM, PacketDirection.OUTGOING,this));
+        if(this.channel.pipeline().get("packet-encoder") != null){
+            this.channel.pipeline().addAfter("packet-encoder","mcnative-packet-encoder"
+                    ,new MinecraftProtocolEncoder(McNative.getInstance().getLocal().getPacketManager()
+                            ,Endpoint.UPSTREAM, PacketDirection.OUTGOING,this));
+        }
     }
 
     @Internal

@@ -29,6 +29,8 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.*;
 import net.pretronic.libraries.command.sender.CommandSender;
 import net.pretronic.libraries.event.EventBus;
+import net.pretronic.libraries.utility.Iterators;
+import net.pretronic.libraries.utility.interfaces.ObjectOwner;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.mcnative.runtime.api.McNative;
 import org.mcnative.runtime.api.connection.ConnectionState;
@@ -76,6 +78,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public final class McNativeBridgeEventHandler {
 
@@ -87,6 +90,7 @@ public final class McNativeBridgeEventHandler {
     private final EventBus eventBus;
     private final Map<UUID, BungeeProxiedPlayer> initializingPlayer;
     private final Map<UUID, BungeeProxiedPlayer> pendingPlayers;
+    private final Map<Long,BungeeProxiedPlayer> disconnectingPlayers;
 
     public McNativeBridgeEventHandler(McNativeBridgedEventBus pluginManager, EventBus eventBus, BungeeCordPlayerManager playerManager, BungeeCordServerMap serverMap) {
         this.pluginManager = pluginManager;
@@ -96,8 +100,14 @@ public final class McNativeBridgeEventHandler {
 
         this.initializingPlayer = new ConcurrentHashMap<>();
         this.pendingPlayers = new ConcurrentHashMap<>();
+        this.disconnectingPlayers = new ConcurrentHashMap<>();
 
         setup();
+        McNative.getInstance().getScheduler().createTask(ObjectOwner.SYSTEM).async()
+                .delay(5, TimeUnit.SECONDS).interval(200,TimeUnit.MILLISECONDS).execute(() -> {
+            long timeout = System.currentTimeMillis()+500;
+            disconnectingPlayers.keySet().removeIf(time -> time > timeout);
+        });
     }
 
     private void setup(){
@@ -232,18 +242,18 @@ public final class McNativeBridgeEventHandler {
     }
 
     private void handleServerConnected(ServerConnectedEvent event){
-        ConnectedMinecraftPlayer player = playerManager.getMappedPlayer(event.getPlayer());
+        BungeeProxiedPlayer player = playerManager.getMappedPlayer(event.getPlayer());
         MinecraftServer server = serverMap.getMappedServer(event.getServer().getInfo());
         MinecraftPlayerServerConnectedEvent mcNativeEvent = new BungeeServerConnectedEvent(player,server);
 
-        ((BungeeProxiedPlayer)player).setServer(server);
-        ((BungeeProxiedPlayer) player).injectDownstreamProtocolHandlersToPipeline();
+        player.setServer(server);
+        player.injectDownstreamProtocolHandlersToPipeline();
 
         eventBus.callEvents(ServerConnectedEvent.class,event,mcNativeEvent);
 
-        if(((BungeeProxiedPlayer)player).isFirstJoin()) {
+        if(player.isFirstJoin()) {
             eventBus.callEvent(MinecraftPlayerLoginConfirmEvent.class, new DefaultMinecraftPlayerLoginConfirmEvent(player));
-            ((BungeeProxiedPlayer)player).setFirstJoin(false);
+            player.setFirstJoin(false);
 
             //set global Tablist if available
             Tablist serverTablist = McNative.getInstance().getLocal().getServerTablist();
@@ -282,15 +292,17 @@ public final class McNativeBridgeEventHandler {
     }
 
     private void handleLogout(PlayerDisconnectEvent event){
-        ConnectedMinecraftPlayer player = this.pendingPlayers.get(event.getPlayer().getUniqueId());
+        BungeeProxiedPlayer player = this.pendingPlayers.get(event.getPlayer().getUniqueId());
         if(player == null) player = playerManager.getMappedPlayer(event.getPlayer());
-        if(player instanceof BungeeProxiedPlayer) ((BungeeProxiedPlayer) player).handleLogout();
+        player.handleLogout();
         MinecraftPlayerLogoutEvent mcNativeEvent = new BungeeMinecraftLogoutEvent(player);
         eventBus.callEvents(PlayerDisconnectEvent.class,event,mcNativeEvent);
+
+        this.disconnectingPlayers.put(System.currentTimeMillis(),player);
         playerManager.unregisterPlayer(event.getPlayer().getUniqueId());
 
         player.setTablist(null);
-        ((BungeeProxiedPlayer)player).clearBossBar();
+        player.clearBossBar();
         Tablist serverTablist = McNative.getInstance().getLocal().getServerTablist();
         if(serverTablist != null) serverTablist.removeEntry(player);
     }
@@ -324,6 +336,7 @@ public final class McNativeBridgeEventHandler {
         if(event.getSender() instanceof ProxiedPlayer){
             BungeeProxiedPlayer player = this.initializingPlayer.get(((ProxiedPlayer) event.getSender()).getUniqueId());
             if(player == null) player = this.pendingPlayers.get(((ProxiedPlayer) event.getSender()).getUniqueId());
+            if(player == null) player = Iterators.findOne(this.disconnectingPlayers.values(), player1 -> player1.getUniqueId().equals(((ProxiedPlayer) event.getSender()).getUniqueId()));
             if(player == null) player = (BungeeProxiedPlayer) playerManager.getMappedPlayer((ProxiedPlayer) event.getSender());
             if(player.getOriginal() == null) player.setOriginal((ProxiedPlayer) event.getSender());
             sender = player;
@@ -353,11 +366,11 @@ public final class McNativeBridgeEventHandler {
     }
 
     private void handleSettingsChange(SettingsChangedEvent event){
-        ConnectedMinecraftPlayer player = playerManager.getMappedPlayer(event.getPlayer());
+        BungeeProxiedPlayer player = playerManager.getMappedPlayer(event.getPlayer());
         PlayerClientSettings settings = mapSettings(event.getPlayer());
         MinecraftPlayerSettingsChangedEvent mcNativeEvent = new BungeeMinecraftPlayerSettingsChangedEvent(player,settings);
         eventBus.callEvents(PermissionCheckEvent.class,event,mcNativeEvent);
-        ((BungeeProxiedPlayer)player).setSettings(settings);
+        player.setSettings(settings);
     }
 
     private PlayerClientSettings mapSettings(ProxiedPlayer player){
