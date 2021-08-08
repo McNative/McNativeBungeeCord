@@ -66,7 +66,7 @@ public class McNativeBungeeCordConfiguration {
     @DocumentKey("player.displayName.format")
     public static String PLAYER_DISPLAY_NAME_FORMAT = "{design.color}{name}";
 
-    public static Map<String,String> PLAYER_COLORS_COLORS = new LinkedHashMap<>();
+    public static LinkedHashMap<String,String> PLAYER_COLORS_COLORS = new LinkedHashMap<>();
     public static String PLAYER_COLORS_DEFAULT = "&7";
 
     public static boolean PLAYER_GLOBAL_CHAT_ENABLED = false;
