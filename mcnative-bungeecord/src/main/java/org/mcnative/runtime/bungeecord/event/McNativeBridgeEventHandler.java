@@ -104,8 +104,8 @@ public final class McNativeBridgeEventHandler {
 
         setup();
         McNative.getInstance().getScheduler().createTask(ObjectOwner.SYSTEM).async()
-                .delay(5, TimeUnit.SECONDS).interval(200,TimeUnit.MILLISECONDS).execute(() -> {
-            long timeout = System.currentTimeMillis()+500;
+                .delay(5, TimeUnit.SECONDS).interval(300,TimeUnit.MILLISECONDS).execute(() -> {
+            long timeout = System.currentTimeMillis()+800;
             disconnectingPlayers.keySet().removeIf(time -> time > timeout);
         });
     }
