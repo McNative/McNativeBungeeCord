@@ -179,7 +179,7 @@ public final class McNativeBridgeEventHandler {
         eventBus.callEvents(ProxyPingEvent.class,event,mcNativeEvent);
         AbstractSyncProxyManagement service = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(AbstractSyncProxyManagement.class);
 
-        System.out.println(DocumentFileType.JSON.getWriter().write(Document.newDocument(ReflectionUtil.getFieldValue(service,"onlineCountCache")),true));
+        System.out.println(DocumentFileType.JSON.getWriter().write(Document.newDocument(ReflectionUtil.getFieldValue(AbstractSyncProxyManagement.class,service,"onlineCountCache")),true));
 
     }
 
