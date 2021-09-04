@@ -308,6 +308,7 @@ public final class McNativeBridgeEventHandler {
     }
 
     private void handleLogout(PlayerDisconnectEvent event){
+        System.out.println("DISCONNECT START");
         BungeeProxiedPlayer player = this.pendingPlayers.get(event.getPlayer().getUniqueId());
         if(player == null) player = playerManager.getMappedPlayer(event.getPlayer());
         player.handleLogout();
@@ -321,6 +322,9 @@ public final class McNativeBridgeEventHandler {
         player.clearBossBar();
         Tablist serverTablist = McNative.getInstance().getLocal().getServerTablist();
         if(serverTablist != null) serverTablist.removeEntry(player);
+
+
+        System.out.println("DISCONNECT COMPLETED");
     }
 
     private void handleChatEvent(ChatEvent event) {
