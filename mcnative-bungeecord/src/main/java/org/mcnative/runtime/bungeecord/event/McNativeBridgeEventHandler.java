@@ -20,6 +20,8 @@
 
 package org.mcnative.runtime.bungeecord.event;
 
+import de.dytanic.cloudnet.driver.CloudNetDriver;
+import de.dytanic.cloudnet.ext.syncproxy.AbstractSyncProxyManagement;
 import net.md_5.bungee.api.Favicon;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.SkinConfiguration;
@@ -28,6 +30,8 @@ import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.*;
 import net.pretronic.libraries.command.sender.CommandSender;
+import net.pretronic.libraries.document.Document;
+import net.pretronic.libraries.document.type.DocumentFileType;
 import net.pretronic.libraries.event.EventBus;
 import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.interfaces.ObjectOwner;
@@ -173,6 +177,10 @@ public final class McNativeBridgeEventHandler {
         System.out.println("ORIGINAL PLAYERS: "+event.getResponse().getPlayers().getOnline());
         System.out.println("CLOUD PLAYERS: "+McNative.getInstance().getNetwork().getOnlineCount());
         eventBus.callEvents(ProxyPingEvent.class,event,mcNativeEvent);
+        AbstractSyncProxyManagement service = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(AbstractSyncProxyManagement.class);
+
+        System.out.println(DocumentFileType.JSON.getWriter().write(Document.newDocument(ReflectionUtil.getFieldValue(service,"onlineCountCache")),true));
+
     }
 
     private void handleLogin(LoginEvent event){
