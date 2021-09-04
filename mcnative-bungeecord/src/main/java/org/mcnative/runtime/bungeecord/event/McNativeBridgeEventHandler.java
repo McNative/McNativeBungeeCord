@@ -166,6 +166,10 @@ public final class McNativeBridgeEventHandler {
         if(DEFAULT_FAVICON != null) event.getResponse().setFavicon(DEFAULT_FAVICON);
         ServerStatusResponse defaultResponse = ProxyService.getInstance().getStatusResponse();
         if(defaultResponse != null) mcNativeEvent.setResponse(defaultResponse.clone());
+
+        System.out.println("COPY PLAYERS: "+(defaultResponse != null ? defaultResponse.getOnlinePlayers() : -1));
+        System.out.println("ORIGINAL PLAYERS: "+event.getResponse().getPlayers().getOnline());
+
         eventBus.callEvents(ProxyPingEvent.class,event,mcNativeEvent);
     }
 
