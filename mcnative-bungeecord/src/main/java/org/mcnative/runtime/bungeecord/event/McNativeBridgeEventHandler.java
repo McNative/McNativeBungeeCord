@@ -20,25 +20,22 @@
 
 package org.mcnative.runtime.bungeecord.event;
 
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.ext.syncproxy.AbstractSyncProxyManagement;
 import net.md_5.bungee.api.Favicon;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.SkinConfiguration;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.*;
 import net.pretronic.libraries.command.sender.CommandSender;
-import net.pretronic.libraries.document.Document;
-import net.pretronic.libraries.document.type.DocumentFileType;
 import net.pretronic.libraries.event.EventBus;
 import net.pretronic.libraries.utility.Iterators;
 import net.pretronic.libraries.utility.interfaces.ObjectOwner;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.mcnative.runtime.api.McNative;
 import org.mcnative.runtime.api.connection.ConnectionState;
-import org.mcnative.runtime.api.event.player.*;
+import org.mcnative.runtime.api.event.player.MinecraftPlayerChatEvent;
+import org.mcnative.runtime.api.event.player.MinecraftPlayerCommandPreprocessEvent;
+import org.mcnative.runtime.api.event.player.MinecraftPlayerLogoutEvent;
 import org.mcnative.runtime.api.event.player.login.MinecraftPlayerLoginConfirmEvent;
 import org.mcnative.runtime.api.event.player.login.MinecraftPlayerLoginEvent;
 import org.mcnative.runtime.api.event.player.login.MinecraftPlayerPendingLoginEvent;
@@ -173,15 +170,7 @@ public final class McNativeBridgeEventHandler {
             mcNativeEvent.setResponse(defaultResponse.clone());
             defaultResponse.setOnlinePlayers(McNative.getInstance().getNetwork().getOnlineCount());
         }
-        System.out.println("COPY PLAYERS: "+(defaultResponse != null ? defaultResponse.getOnlinePlayers() : -1));
-        System.out.println("ORIGINAL PLAYERS: "+event.getResponse().getPlayers().getOnline());
-        System.out.println("CLOUD PLAYERS: "+McNative.getInstance().getNetwork().getOnlineCount());
-        System.out.println("PROXY PLAYERS: "+ProxyServer.getInstance().getPlayers().size());
         eventBus.callEvents(ProxyPingEvent.class,event,mcNativeEvent);
-        AbstractSyncProxyManagement service = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(AbstractSyncProxyManagement.class);
-
-        System.out.println(DocumentFileType.JSON.getWriter().write(Document.newDocument(ReflectionUtil.getFieldValue(AbstractSyncProxyManagement.class,service,"onlineCountCache")),true));
-
     }
 
     private void handleLogin(LoginEvent event){
@@ -309,7 +298,6 @@ public final class McNativeBridgeEventHandler {
 
     private void handleLogout(PlayerDisconnectEvent event){
         try{
-            System.out.println("DISCONNECT START");
             BungeeProxiedPlayer player = this.pendingPlayers.get(event.getPlayer().getUniqueId());
             if(player == null) player = playerManager.getMappedPlayer(event.getPlayer());
             player.handleLogout();
@@ -323,9 +311,6 @@ public final class McNativeBridgeEventHandler {
             player.clearBossBar();
             Tablist serverTablist = McNative.getInstance().getLocal().getServerTablist();
             if(serverTablist != null) serverTablist.removeEntry(player);
-
-
-            System.out.println("DISCONNECT COMPLETED");
         }catch (Exception e){
             e.printStackTrace();
         }
