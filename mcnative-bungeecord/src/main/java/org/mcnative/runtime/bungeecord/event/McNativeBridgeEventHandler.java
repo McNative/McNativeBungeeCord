@@ -176,6 +176,7 @@ public final class McNativeBridgeEventHandler {
         System.out.println("COPY PLAYERS: "+(defaultResponse != null ? defaultResponse.getOnlinePlayers() : -1));
         System.out.println("ORIGINAL PLAYERS: "+event.getResponse().getPlayers().getOnline());
         System.out.println("CLOUD PLAYERS: "+McNative.getInstance().getNetwork().getOnlineCount());
+        System.out.println("PROXY PLAYERS: "+ProxyServer.getInstance().getPlayers().size());
         eventBus.callEvents(ProxyPingEvent.class,event,mcNativeEvent);
         AbstractSyncProxyManagement service = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(AbstractSyncProxyManagement.class);
 
