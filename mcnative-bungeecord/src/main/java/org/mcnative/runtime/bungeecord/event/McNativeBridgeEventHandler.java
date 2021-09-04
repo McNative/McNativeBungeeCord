@@ -283,6 +283,7 @@ public final class McNativeBridgeEventHandler {
 
     private void handleServerKick(ServerKickEvent event){
         ConnectedMinecraftPlayer player = this.pendingPlayers.get(event.getPlayer().getUniqueId());
+        if(player == null) player = Iterators.findOne(this.disconnectingPlayers.values(), player1 -> player1.getUniqueId().equals(event.getPlayer().getUniqueId()));
         if(player == null) player = playerManager.getMappedPlayer(event.getPlayer());
 
         MinecraftPlayerServerKickEvent mcNativeEvent = new BungeeServerKickEvent(serverMap,event,player);
