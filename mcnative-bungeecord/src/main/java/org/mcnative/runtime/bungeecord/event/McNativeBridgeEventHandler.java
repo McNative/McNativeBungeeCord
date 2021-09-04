@@ -165,8 +165,10 @@ public final class McNativeBridgeEventHandler {
         BungeeServerListPingEvent mcNativeEvent = new BungeeServerListPingEvent(event.getConnection(),event);
         if(DEFAULT_FAVICON != null) event.getResponse().setFavicon(DEFAULT_FAVICON);
         ServerStatusResponse defaultResponse = ProxyService.getInstance().getStatusResponse();
-        if(defaultResponse != null) mcNativeEvent.setResponse(defaultResponse.clone());
-
+        if(defaultResponse != null){
+            mcNativeEvent.setResponse(defaultResponse.clone());
+            defaultResponse.setOnlinePlayers(McNative.getInstance().getNetwork().getOnlineCount());
+        }
         System.out.println("COPY PLAYERS: "+(defaultResponse != null ? defaultResponse.getOnlinePlayers() : -1));
         System.out.println("ORIGINAL PLAYERS: "+event.getResponse().getPlayers().getOnline());
 
