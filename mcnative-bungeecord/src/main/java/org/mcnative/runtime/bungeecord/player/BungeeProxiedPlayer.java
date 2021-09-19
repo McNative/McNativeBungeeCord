@@ -216,6 +216,12 @@ public class BungeeProxiedPlayer extends OfflineMinecraftPlayer implements Conne
     }
 
     @Override
+    public void kickLocal(MessageComponent<?> messageComponent, VariableSet variableSet) {
+        original.getServer().disconnect();
+        sendMessage(messageComponent,variableSet);
+    }
+
+    @Override
     public DeviceInfo getDevice() {
         return DeviceInfo.JAVA;
     }

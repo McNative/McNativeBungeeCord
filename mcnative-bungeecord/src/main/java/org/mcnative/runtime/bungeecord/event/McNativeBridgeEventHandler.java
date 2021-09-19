@@ -24,7 +24,6 @@ import net.md_5.bungee.api.Favicon;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.SkinConfiguration;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.*;
 import net.pretronic.libraries.command.sender.CommandSender;
@@ -34,7 +33,9 @@ import net.pretronic.libraries.utility.interfaces.ObjectOwner;
 import net.pretronic.libraries.utility.reflect.ReflectionUtil;
 import org.mcnative.runtime.api.McNative;
 import org.mcnative.runtime.api.connection.ConnectionState;
-import org.mcnative.runtime.api.event.player.*;
+import org.mcnative.runtime.api.event.player.MinecraftPlayerChatEvent;
+import org.mcnative.runtime.api.event.player.MinecraftPlayerCommandPreprocessEvent;
+import org.mcnative.runtime.api.event.player.MinecraftPlayerLogoutEvent;
 import org.mcnative.runtime.api.event.player.login.MinecraftPlayerLoginConfirmEvent;
 import org.mcnative.runtime.api.event.player.login.MinecraftPlayerLoginEvent;
 import org.mcnative.runtime.api.event.player.login.MinecraftPlayerPendingLoginEvent;
@@ -104,8 +105,8 @@ public final class McNativeBridgeEventHandler {
 
         setup();
         McNative.getInstance().getScheduler().createTask(ObjectOwner.SYSTEM).async()
-                .delay(5, TimeUnit.SECONDS).interval(200,TimeUnit.MILLISECONDS).execute(() -> {
-            long timeout = System.currentTimeMillis()+500;
+                .delay(5, TimeUnit.SECONDS).interval(300,TimeUnit.MILLISECONDS).execute(() -> {
+            long timeout = System.currentTimeMillis()+800;
             disconnectingPlayers.keySet().removeIf(time -> time > timeout);
         });
     }
@@ -165,7 +166,10 @@ public final class McNativeBridgeEventHandler {
         BungeeServerListPingEvent mcNativeEvent = new BungeeServerListPingEvent(event.getConnection(),event);
         if(DEFAULT_FAVICON != null) event.getResponse().setFavicon(DEFAULT_FAVICON);
         ServerStatusResponse defaultResponse = ProxyService.getInstance().getStatusResponse();
-        if(defaultResponse != null) mcNativeEvent.setResponse(defaultResponse.clone());
+        if(defaultResponse != null){
+            mcNativeEvent.setResponse(defaultResponse.clone());
+            defaultResponse.setOnlinePlayers(McNative.getInstance().getNetwork().getOnlineCount());
+        }
         eventBus.callEvents(ProxyPingEvent.class,event,mcNativeEvent);
     }
 
@@ -277,6 +281,7 @@ public final class McNativeBridgeEventHandler {
 
     private void handleServerKick(ServerKickEvent event){
         ConnectedMinecraftPlayer player = this.pendingPlayers.get(event.getPlayer().getUniqueId());
+        if(player == null) player = Iterators.findOne(this.disconnectingPlayers.values(), player1 -> player1.getUniqueId().equals(event.getPlayer().getUniqueId()));
         if(player == null) player = playerManager.getMappedPlayer(event.getPlayer());
 
         MinecraftPlayerServerKickEvent mcNativeEvent = new BungeeServerKickEvent(serverMap,event,player);
@@ -292,19 +297,23 @@ public final class McNativeBridgeEventHandler {
     }
 
     private void handleLogout(PlayerDisconnectEvent event){
-        BungeeProxiedPlayer player = this.pendingPlayers.get(event.getPlayer().getUniqueId());
-        if(player == null) player = playerManager.getMappedPlayer(event.getPlayer());
-        player.handleLogout();
-        MinecraftPlayerLogoutEvent mcNativeEvent = new BungeeMinecraftLogoutEvent(player);
-        eventBus.callEvents(PlayerDisconnectEvent.class,event,mcNativeEvent);
+        try{
+            BungeeProxiedPlayer player = this.pendingPlayers.get(event.getPlayer().getUniqueId());
+            if(player == null) player = playerManager.getMappedPlayer(event.getPlayer());
+            player.handleLogout();
+            MinecraftPlayerLogoutEvent mcNativeEvent = new BungeeMinecraftLogoutEvent(player);
+            eventBus.callEvents(PlayerDisconnectEvent.class,event,mcNativeEvent);
 
-        this.disconnectingPlayers.put(System.currentTimeMillis(),player);
-        playerManager.unregisterPlayer(event.getPlayer().getUniqueId());
+            this.disconnectingPlayers.put(System.currentTimeMillis(),player);
+            playerManager.unregisterPlayer(event.getPlayer().getUniqueId());
 
-        player.setTablist(null);
-        player.clearBossBar();
-        Tablist serverTablist = McNative.getInstance().getLocal().getServerTablist();
-        if(serverTablist != null) serverTablist.removeEntry(player);
+            player.setTablist(null);
+            player.clearBossBar();
+            Tablist serverTablist = McNative.getInstance().getLocal().getServerTablist();
+            if(serverTablist != null) serverTablist.removeEntry(player);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void handleChatEvent(ChatEvent event) {
