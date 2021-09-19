@@ -68,6 +68,9 @@ public class McNativePlayerActionListener implements MessagingChannelListener {
             }else if(action.equalsIgnoreCase("kick")){
                 Document jsonText = request.getDocument("message");
                 player.kick(Text.decompile(jsonText));
+            }else if(action.equalsIgnoreCase("kickLocal")){
+                Document jsonText = request.getDocument("message");
+                player.kickLocal(Text.decompile(jsonText));
             }else if(action.equalsIgnoreCase("performCommand")){
                 String command = request.getString("command");
                 player.performCommand(command);
