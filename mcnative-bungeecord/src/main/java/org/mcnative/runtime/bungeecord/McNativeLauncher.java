@@ -180,6 +180,10 @@ public class McNativeLauncher {
 
         ResourceMessageExtractor.extractMessages(McNativeLauncher.class.getClassLoader(),"system-messages/","McNative");
 
+        if(McNativeBungeeCordConfiguration.NETWORK_PACKET_MANIPULATION_INJECT_COMMAND_COMPLETION){
+            localService.getEventBus().subscribe(ObjectOwner.SYSTEM,new TabCompleteInjectListener());
+        }
+
         if(McNativeBungeeCordConfiguration.CONSOLE_MAF_ENABLED && McNative.getInstance().getConsoleCredentials() != null){
             MAFService.start();
         }
