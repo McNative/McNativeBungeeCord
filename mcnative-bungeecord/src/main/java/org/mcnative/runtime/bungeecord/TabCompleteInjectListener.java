@@ -12,10 +12,10 @@ public class TabCompleteInjectListener {
 
     @Listener(priority = EventPriority.LOW)
     public void handleTabComplete(MinecraftPlayerTabCompleteResponseEvent event){
-        System.out.println("TAB COMPLETE "+event.getCursor());
+        String cursor = event.getCursor().length() > 0 && event.getCursor().charAt(0) == '/' ? event.getCursor().substring(1) : event.getCursor();
         List<String> completion = Iterators.map(McNative.getInstance().getLocal().getCommandManager().getCommands()
                 , command -> command.getConfiguration().getName()
-                , command -> command.getConfiguration().getName().startsWith(event.getCursor()));
+                , command -> command.getConfiguration().getName().startsWith(cursor));
         event.getSuggestions().addAll(completion);
     }
 
