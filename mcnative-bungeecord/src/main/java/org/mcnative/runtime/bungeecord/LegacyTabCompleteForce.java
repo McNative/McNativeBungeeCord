@@ -16,19 +16,17 @@ public class LegacyTabCompleteForce {
     }
 
     public static void rewrite(ByteBuf buffer){
-        System.out.println("REWRITE TAB 2");
+        System.out.println("REWRITE TAB");
         MinecraftProtocolUtil.writeVarInt(buffer,2);
 
 
         //node 0
         byte flags = 0;
-        flags |= 0x10;
         buffer.writeByte(flags);
-        MinecraftProtocolUtil.writeVarInt(buffer,0);
-        MinecraftProtocolUtil.writeString(buffer,"minecraft:ask_server");
+        MinecraftProtocolUtil.writeVarInt(buffer,1);
+        MinecraftProtocolUtil.writeVarInt(buffer,1);
         //end node
 
-        /*
         //node 1
         byte flags2 = 2;
         flags2 |= 0x10;
@@ -39,7 +37,6 @@ public class LegacyTabCompleteForce {
         MinecraftProtocolUtil.writeVarInt(buffer,2);
         MinecraftProtocolUtil.writeString(buffer,"minecraft:ask_server");
         //end node
-         */
 
         MinecraftProtocolUtil.writeVarInt(buffer,0);
     }
