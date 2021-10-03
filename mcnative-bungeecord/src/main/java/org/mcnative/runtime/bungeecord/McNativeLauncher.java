@@ -188,8 +188,6 @@ public class McNativeLauncher {
             MAFService.start();
         }
 
-        ProxyServer.getInstance().getPluginManager().registerListener(getPlugin(),new Test());
-
         logger.info(McNative.CONSOLE_PREFIX+"McNative successfully started.");
     }
 
