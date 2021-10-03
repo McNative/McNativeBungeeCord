@@ -22,7 +22,12 @@ public class TabCompleteInjectListener {
                         }
                         return false;
                     });
+
+            System.out.println("-------------");
+            System.out.println(event.getSuggestions());
             event.getSuggestions().addAll(completion);
+            System.out.println(event.getSuggestions());
+            System.out.println("-------------");
         }
     }
 
