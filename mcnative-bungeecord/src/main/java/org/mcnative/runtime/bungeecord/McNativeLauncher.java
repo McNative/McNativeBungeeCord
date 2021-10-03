@@ -170,7 +170,7 @@ public class McNativeLauncher {
         logger.info(McNative.CONSOLE_PREFIX+"McNative initialised and injected event bus.");
 
         new McNativeBridgeEventHandler(eventBus,localService.getEventBus(),playerManager,serverMap);
-        new McNativeTabCompleteEventHandler(localService.getEventBus(),localService.getPacketManager());
+        new McNativeTabCompleteEventHandler(localService.getEventBus(),localService.getPacketManager(),false);
         logger.info(McNative.CONSOLE_PREFIX+"McNative has overwritten default bungeecord events.");
 
         McNativeBungeeCordConfiguration.postLoad();
@@ -179,6 +179,10 @@ public class McNativeLauncher {
         instance.setReady(true);
 
         ResourceMessageExtractor.extractMessages(McNativeLauncher.class.getClassLoader(),"system-messages/","McNative");
+
+        if(McNativeBungeeCordConfiguration.NETWORK_PACKET_MANIPULATION_INJECT_COMMAND_COMPLETION){
+            localService.getEventBus().subscribe(ObjectOwner.SYSTEM,new TabCompleteInjectListener());
+        }
 
         if(McNativeBungeeCordConfiguration.CONSOLE_MAF_ENABLED && McNative.getInstance().getConsoleCredentials() != null){
             MAFService.start();
