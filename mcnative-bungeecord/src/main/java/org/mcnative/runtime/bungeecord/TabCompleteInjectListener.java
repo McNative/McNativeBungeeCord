@@ -29,6 +29,7 @@ public class TabCompleteInjectListener {
             HashSet<String> result = new HashSet<>(event.getSuggestions());
             result.addAll(completion);
 
+
             event.setSuggestions(new ArrayList<>(result));
         }
     }
