@@ -63,7 +63,7 @@ public class BungeeCordServerStatusResponse implements ServerStatusResponse {
 
     @Override
     public ServerVersion getVersion() {
-        return new ServerVersion(ping.getVersion().getName(),MinecraftProtocolVersion.of(MinecraftEdition.BEDROCK,ping.getVersion().getProtocol()));
+        return new ServerVersion(ping.getVersion().getName(),MinecraftProtocolVersion.of(MinecraftEdition.JAVA,ping.getVersion().getProtocol()));
     }
 
     @Override
