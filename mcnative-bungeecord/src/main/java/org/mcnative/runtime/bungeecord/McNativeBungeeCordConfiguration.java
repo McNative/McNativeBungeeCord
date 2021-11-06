@@ -87,6 +87,9 @@ public class McNativeBungeeCordConfiguration {
     public static transient MessageComponent<?> PLAYER_GLOBAL_TABLIST_OVERVIEW_HEADER_LOADED;
     public static transient MessageComponent<?> PLAYER_GLOBAL_TABLIST_OVERVIEW_FOOTER_LOADED;
 
+    @DocumentKey("network.messaging.packetManipulation.injectCommandCompletion")
+    public static boolean NETWORK_PACKET_MANIPULATION_INJECT_COMMAND_COMPLETION = true;
+
     @DocumentKey("network.messaging.packetManipulation.upstream")
     public static boolean NETWORK_PACKET_MANIPULATION_UPSTREAM_ENABLED = true;
     @DocumentKey("network.messaging.packetManipulation.downstream")
