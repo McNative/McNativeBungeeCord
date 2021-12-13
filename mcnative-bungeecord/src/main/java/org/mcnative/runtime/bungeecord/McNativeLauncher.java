@@ -184,9 +184,11 @@ public class McNativeLauncher {
             localService.getEventBus().subscribe(ObjectOwner.SYSTEM,new TabCompleteInjectListener());
         }
 
+        /*
         if(McNativeBungeeCordConfiguration.CONSOLE_MAF_ENABLED && McNative.getInstance().getConsoleCredentials() != null){
             MAFService.start();
         }
+         */
 
         logger.info(McNative.CONSOLE_PREFIX+"McNative successfully started.");
     }
