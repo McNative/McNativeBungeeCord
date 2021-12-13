@@ -16,7 +16,6 @@ public class LegacyTabCompleteForce {
     }
 
     public static void rewrite(ByteBuf buffer){
-        System.out.println("REWRITE TAB");
         MinecraftProtocolUtil.writeVarInt(buffer,2);
 
 
