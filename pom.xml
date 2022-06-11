@@ -47,6 +47,7 @@
     </organization>
 
     <properties>
+
         <!-- Project settings -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
